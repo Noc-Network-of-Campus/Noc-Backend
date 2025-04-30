@@ -1,5 +1,6 @@
 package com.mycompany.myapp.domain;
 
+import com.mycompany.myapp.domain.base.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
@@ -8,15 +9,16 @@ import javax.persistence.*;
 @Builder @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Category {
+public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(nullable = false, unique = true)
+    private String email;
 
     @Column(nullable = false)
-    private String name;
+    private String nickname;
+
+    private String profileUrl;
 }
