@@ -36,6 +36,8 @@ dependencies {
 
 	// swagger
 	implementation 'io.springfox:springfox-boot-starter:3.0.0'
+
+	implementation 'org.hibernate:hibernate-spatial'
 }
 
 tasks.named('test') {
