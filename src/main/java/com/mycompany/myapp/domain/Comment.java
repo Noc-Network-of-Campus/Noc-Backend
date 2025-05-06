@@ -4,6 +4,7 @@ import com.mycompany.myapp.domain.base.BaseEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter @Builder
@@ -25,6 +26,9 @@ public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
     private Comment parentComment; // nullable 허용
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommentLike> commentLikes;
 
     private String content;
     private Integer likeCount;
