@@ -12,12 +12,18 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import com.mycompany.myapp.config.security.handler.CustomOAuth2SuccessHandler;
+import com.mycompany.myapp.service.CustomOAuth2UserService;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+	private final CustomOAuth2UserService customOAuth2UserService;
+	private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -26,7 +32,7 @@ public class SecurityConfig {
 				@Override
 				public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 					CorsConfiguration config = new CorsConfiguration();
-					config.addAllowedOrigin("http://localhost:3000");
+					config.addAllowedOrigin("http://localhost:8080");
 					config.addAllowedMethod("*");
 					config.addAllowedHeader("*");
 					config.setAllowCredentials(true);
@@ -38,7 +44,10 @@ public class SecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.sessionManagement((session) -> session
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.oauth2Client();
+			.oauth2Login(oauth2 -> oauth2
+				.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+				.successHandler(customOAuth2SuccessHandler)
+			);
 		return http.build();
 	}
 }
