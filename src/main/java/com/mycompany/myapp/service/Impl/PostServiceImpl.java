@@ -65,4 +65,11 @@ public class PostServiceImpl implements PostService {
         }
         postRepository.delete(post);
     }
+
+    @Override
+    public PostResponseDto.PostDetailDto getPostDetail(Long postId, Member member){
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+        return postConverter.toPostDetailDto(post, member);
+    }
 }

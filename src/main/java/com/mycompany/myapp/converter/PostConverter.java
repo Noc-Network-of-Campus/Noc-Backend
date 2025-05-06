@@ -1,14 +1,21 @@
 package com.mycompany.myapp.converter;
 
 import com.mycompany.myapp.domain.Image;
+import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.domain.Post;
+import com.mycompany.myapp.web.dto.CommentResponseDto;
 import com.mycompany.myapp.web.dto.PostResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Component
 public class PostConverter {
+
+    private final CommentConverter commentConverter;
 
     public PostResponseDto.SimplePostDto toSimplePostDto(Post post) {
         return PostResponseDto.SimplePostDto.builder()
@@ -38,6 +45,29 @@ public class PostConverter {
                 .findFirst()
                 .map(Image::getImageUrl)
                 .orElse(null);
+    }
+
+    public PostResponseDto.PostDetailDto toPostDetailDto(Post post, Member member) {
+        List<String> imageUrls = post.getImages().stream()
+                .map(Image::getImageUrl)
+                .collect(Collectors.toList());
+
+        List<CommentResponseDto.CommentDetailDto> commentDtos = post.getComments().stream()
+                .map(comment -> commentConverter.toCommentDetailDto(comment, member))
+                .collect(Collectors.toList());
+
+        return PostResponseDto.PostDetailDto.builder()
+                .postId(post.getId())
+                .title(post.getTitle())
+                .content(post.getContent())
+                .likeCount(post.getLikeCount())
+                .commentCount(post.getCommentCount())
+                .category(post.getCategory().name())
+                .images(imageUrls)
+                .isMyPost(post.getMember().getId().equals(member.getId()))
+                .comments(commentDtos)
+                .createdAt(post.getCreatedAt())
+                .build();
     }
 }
 

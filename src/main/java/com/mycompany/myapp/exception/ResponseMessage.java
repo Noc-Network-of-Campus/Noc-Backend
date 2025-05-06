@@ -15,6 +15,7 @@ public class ResponseMessage {
     public static final String CREATE_REPORT_SUCCESS = "신고하기 성공";
 
     //post
-    public static final String READ_POST_SUCCESS = "카테고리별 게시글 불러오기 성공";
+    public static final String READ_POST_LIST_SUCCESS = "카테고리별 게시글 불러오기 성공";
     public static final String DELETE_POST_SUCCESS = "게시글 삭제 성공";
+    public static final String READ_POST_SUCCESS = "게시글 상세 조회 성공";
 }

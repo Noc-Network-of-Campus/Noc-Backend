@@ -10,4 +10,5 @@ import java.util.List;
 public interface PostService {
     List<PostResponseDto.SimplePostDto> getPostsByCategory(Category category, SortType sort, Integer page, Integer size);
     void deletePost(Long postId, Member member);
+    PostResponseDto.PostDetailDto getPostDetail(Long postId, Member member);
 }

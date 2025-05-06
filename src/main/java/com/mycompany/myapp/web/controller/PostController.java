@@ -32,7 +32,7 @@ public class PostController extends BaseController {
     private final PostService postService;
 
     @ApiOperation(value = "카테고리별 게시글 조회 API", notes = "카테고리, 정렬 방식, 페이지 번호, 페이지 크기를 기준으로 게시글을 조회합니다.")
-    @ApiResponse(code = 200, message = "댓글 작성 성공")
+    @ApiResponse(code = 200, message = "카테고리별 게시글 불러오기 성공")
     @GetMapping("/list")
     public ResponseEntity getPostListByCategory(@ApiParam(value = "카테고리. 없으면 전체 게시글", example = "FOOD")
                                                     @RequestParam(required = false) Category category,
@@ -50,7 +50,7 @@ public class PostController extends BaseController {
 
             List<PostResponseDto.SimplePostDto> res = postService.getPostsByCategory(category, sort, page, size);
 
-            return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_POST_SUCCESS, res), HttpStatus.OK);
+            return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_POST_LIST_SUCCESS, res), HttpStatus.OK);
         } catch (CustomExceptions.testException e) {
             return handleApiException(e, HttpStatus.BAD_REQUEST);
         }
@@ -68,6 +68,24 @@ public class PostController extends BaseController {
             postService.deletePost(postId, member);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.DELETE_POST_SUCCESS), HttpStatus.OK);
+        } catch (CustomExceptions.testException e) {
+            return handleApiException(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "게시글 상세 조회 API")
+    @ApiResponse(code = 200, message = "게시글 상세 조회 성공")
+    @GetMapping("/{postId}")
+    public ResponseEntity getPost(@PathVariable Long postId){
+        try {
+            logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/{post-id}", "게시글 상세 조회 API");
+
+            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
+            Member member = memberRepository.getByNickname("오리난쟁이");
+
+            PostResponseDto.PostDetailDto res = postService.getPostDetail(postId, member);
+
+            return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_POST_SUCCESS, res), HttpStatus.OK);
         } catch (CustomExceptions.testException e) {
             return handleApiException(e, HttpStatus.BAD_REQUEST);
         }
