@@ -34,7 +34,7 @@ dependencies {
 	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
 	annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
-	//s3
+	// s3
 	implementation("com.amazonaws:aws-java-sdk-s3:1.12.637")
 
 	// swagger
@@ -42,6 +42,10 @@ dependencies {
 
 	implementation 'org.hibernate:hibernate-spatial'
 	implementation 'org.locationtech.jts:jts-core:1.18.2'
+
+	// elasticSearch
+	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
 }
 
 tasks.named('test') {
