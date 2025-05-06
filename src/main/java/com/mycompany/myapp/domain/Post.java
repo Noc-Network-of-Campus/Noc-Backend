@@ -6,6 +6,7 @@ import lombok.*;
 import org.locationtech.jts.geom.Point;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Getter @Builder
@@ -32,6 +33,23 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "POINT")
     private Point location;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> postLikes;
+
     private Integer commentCount;
     private Integer likeCount;
+
+    public void increaseCommentCount() {
+        if (this.commentCount == null) {
+            this.commentCount = 1;
+        } else {
+            this.commentCount += 1;
+        }
+    }
 }
