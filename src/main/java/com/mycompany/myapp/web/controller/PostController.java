@@ -10,6 +10,7 @@ import com.mycompany.myapp.exception.StatusCode;
 import com.mycompany.myapp.repository.MemberRepository;
 import com.mycompany.myapp.service.PostService;
 import com.mycompany.myapp.web.controller.base.BaseController;
+import com.mycompany.myapp.web.dto.PostRequestDto;
 import com.mycompany.myapp.web.dto.PostResponseDto;
 import com.mycompany.myapp.web.dto.base.DefaultRes;
 import io.swagger.annotations.Api;
@@ -108,6 +109,23 @@ public class PostController extends BaseController {
                     : ResponseMessage.POST_UNLIKE_SUCCESS;
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, message), HttpStatus.OK);
+        } catch (CustomExceptions.testException e) {
+            return handleApiException(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "게시글 수정 API")
+    @ApiResponse(code = 200, message = "게시글 수정 성공")
+    @PutMapping("/{postId}")
+    public ResponseEntity updatePost(@PathVariable Long postId, @RequestBody PostRequestDto.UpdatePostDto request){
+        try {
+            logger.info("Received request: method={}, path={}, description={}", "PUT", "/api/post/{post-id}", "게시글 수정 API");
+
+            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
+            Member member = memberRepository.getByNickname("오리난쟁이");
+            postService.updatePost(postId, member, request);
+
+            return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.UPDATE_POST_SUCCESS), HttpStatus.OK);
         } catch (CustomExceptions.testException e) {
             return handleApiException(e, HttpStatus.BAD_REQUEST);
         }

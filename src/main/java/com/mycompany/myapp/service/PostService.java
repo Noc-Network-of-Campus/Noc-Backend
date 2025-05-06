@@ -4,6 +4,7 @@ import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.domain.enums.Category;
 import com.mycompany.myapp.domain.enums.LikeResult;
 import com.mycompany.myapp.domain.enums.SortType;
+import com.mycompany.myapp.web.dto.PostRequestDto;
 import com.mycompany.myapp.web.dto.PostResponseDto;
 
 import java.util.List;
@@ -13,4 +14,5 @@ public interface PostService {
     void deletePost(Long postId, Member member);
     PostResponseDto.PostDetailDto getPostDetail(Long postId, Member member);
     LikeResult togglePostLike(Long postId, Member member);
+    void updatePost(Long postId, Member member, PostRequestDto.UpdatePostDto request);
 }

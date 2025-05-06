@@ -9,6 +9,7 @@ import com.mycompany.myapp.exception.CustomExceptions;
 import com.mycompany.myapp.repository.PostLikeRepository;
 import com.mycompany.myapp.repository.PostRepository;
 import com.mycompany.myapp.service.PostService;
+import com.mycompany.myapp.web.dto.PostRequestDto;
 import com.mycompany.myapp.web.dto.PostResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -98,5 +99,29 @@ public class PostServiceImpl implements PostService {
             post.increaseLikeCount();
             return LikeResult.LIKED;
         }
+    }
+
+    @Override
+    @Transactional
+    public void updatePost(Long postId, Member member, PostRequestDto.UpdatePostDto request){
+        // 게시글 존재 여부 확인
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+
+        // 게시글 수정 권한 확인
+        if (!post.getMember().getId().equals(member.getId())) {
+            throw new SecurityException("게시글 수정 권한이 없습니다.");
+        }
+
+        // null 값이면 기존 값 유지
+        String title = request.getTitle() != null ? request.getTitle() : post.getTitle();
+        String content = request.getContent() != null ? request.getContent() : post.getContent();
+
+        // null이면 Category.FREE, 아니면 Enum 변환
+        Category category = request.getCategory() != null
+                ? Category.valueOf(request.getCategory())
+                : Category.FREE;
+
+        post.updatePost(title, content, category);
     }
 }
