@@ -7,4 +7,5 @@ import com.mycompany.myapp.web.dto.CommentRequestDto;
 public interface CommentService {
     void createComment(CommentRequestDto.CreateCommentDto request, Member member);
     CommentLikeResult toggleCommentLike(Long commentId, Member member);
+    void deleteComment(Long commentId, Member member);
 }

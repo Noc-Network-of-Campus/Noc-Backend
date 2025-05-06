@@ -17,6 +17,7 @@ public class CommentConverter {
                 .content(content)
                 .parentComment(parent)
                 .likeCount(0)
+                .isDeleted(false)
                 .build();
     }
 

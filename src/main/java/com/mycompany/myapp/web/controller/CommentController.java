@@ -31,7 +31,7 @@ public class CommentController extends BaseController {
     @PostMapping
     public ResponseEntity createComment(@RequestBody CommentRequestDto.CreateCommentDto request){
         try {
-            logger.info("Received request: method={}, path={}, description={}", "POST", "/api/comments", "Create Comment API");
+            logger.info("Received request: method={}, path={}, description={}", "POST", "/api/comments", "댓글 작성 API");
 
             // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
             Member member = memberRepository.getByNickname("오리난쟁이");
@@ -48,7 +48,7 @@ public class CommentController extends BaseController {
     @PostMapping("/{commentId}/like")
     public ResponseEntity toggleCommentLike(@PathVariable Long commentId){
         try {
-            logger.info("Received request: method={}, path={}, description={}", "POST", "/api/comments/{}/like", "댓글 좋아요/취소 API");
+            logger.info("Received request: method={}, path={}, description={}", "POST", "/api/comments/{comment-id}/like", "댓글 좋아요/취소 API");
 
             // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
             Member member = memberRepository.getByNickname("오리난쟁이");
@@ -59,6 +59,23 @@ public class CommentController extends BaseController {
                     : ResponseMessage.COMMENT_UNLIKE_SUCCESS;
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, message), HttpStatus.OK);
+        } catch (CustomExceptions.testException e) {
+            return handleApiException(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "댓글 삭제 API")
+    @ApiResponse(code = 200, message = "댓글 삭제 성공")
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity deleteComment(@PathVariable Long commentId){
+        try {
+            logger.info("Received request: method={}, path={}, description={}", "DELETE", "/api/comments/{comment-id}", "댓글 삭제 API");
+
+            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
+            Member member = memberRepository.getByNickname("오리난쟁이");
+            commentService.deleteComment(commentId, member);
+
+            return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.DELETE_COMMENT_SUCCESS), HttpStatus.OK);
         } catch (CustomExceptions.testException e) {
             return handleApiException(e, HttpStatus.BAD_REQUEST);
         }
