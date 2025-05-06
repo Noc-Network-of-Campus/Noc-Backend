@@ -32,4 +32,12 @@ public class Comment extends BaseEntity {
 
     private String content;
     private Integer likeCount;
+
+    public void increaseLikeCount() {
+        this.likeCount = (this.likeCount == null) ? 1 : this.likeCount + 1;
+    }
+
+    public void decreaseLikeCount() {
+        this.likeCount = (this.likeCount == null || this.likeCount <= 0) ? 0 : this.likeCount - 1;
+    }
 }
