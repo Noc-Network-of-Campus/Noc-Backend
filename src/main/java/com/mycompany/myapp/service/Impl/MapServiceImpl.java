@@ -1,11 +1,13 @@
 package com.mycompany.myapp.service.Impl;
 
 import com.mycompany.myapp.converter.MapConverter;
+import com.mycompany.myapp.converter.PostConverter;
 import com.mycompany.myapp.domain.Post;
 import com.mycompany.myapp.domain.enums.Category;
 import com.mycompany.myapp.repository.PostRepository;
 import com.mycompany.myapp.service.MapService;
 import com.mycompany.myapp.web.dto.MapResponseDto;
+import com.mycompany.myapp.web.dto.PostResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ public class MapServiceImpl implements MapService {
 
     private final PostRepository postRepository;
     private final MapConverter mapConverter;
+    private final PostConverter postConverter;
 
     @Override
     public List<MapResponseDto.MapPinDto> getPinsByCategoryAndLocation(Category category, Double latitude, Double longitude){
@@ -35,6 +38,14 @@ public class MapServiceImpl implements MapService {
 
         return posts.stream()
                 .map(mapConverter::toPin)
+                .collect(Collectors.toList());
+    }
+
+    public List<PostResponseDto.SimplePostDto> getPinsByIds(List<Long> ids){
+        List<Post> posts = postRepository.findAllById(ids);
+
+        return posts.stream()
+                .map(postConverter::toSimplePostDto)
                 .collect(Collectors.toList());
     }
 }

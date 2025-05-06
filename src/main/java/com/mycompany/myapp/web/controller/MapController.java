@@ -60,4 +60,22 @@ public class MapController extends BaseController {
             return handleApiException(e, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @ApiOperation(value = "핀 리스트 조회 API")
+    @ApiResponse(code = 200, message = "핀 리스트 조회 성공")
+    @GetMapping("/pins")
+    public ResponseEntity getPins(@RequestParam List<Long> ids){
+        try {
+            logger.info("Received request: method={}, path={}, description={}", "GET", "/api/map/pins", "핀 리스트 조회 API");
+
+            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
+            Member member = memberRepository.getByNickname("오리난쟁이");
+
+            List<PostResponseDto.SimplePostDto> res = mapService.getPinsByIds(ids);
+
+            return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_PINS_SUCCESS, res), HttpStatus.OK);
+        } catch (CustomExceptions.testException e) {
+            return handleApiException(e, HttpStatus.BAD_REQUEST);
+        }
+    }
 }
