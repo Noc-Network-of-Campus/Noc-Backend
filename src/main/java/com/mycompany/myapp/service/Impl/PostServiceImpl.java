@@ -1,8 +1,11 @@
 package com.mycompany.myapp.service.Impl;
 
 import com.mycompany.myapp.converter.PostConverter;
+import com.mycompany.myapp.domain.Member;
+import com.mycompany.myapp.domain.Post;
 import com.mycompany.myapp.domain.enums.Category;
 import com.mycompany.myapp.domain.enums.SortType;
+import com.mycompany.myapp.exception.CustomExceptions;
 import com.mycompany.myapp.repository.PostRepository;
 import com.mycompany.myapp.service.PostService;
 import com.mycompany.myapp.web.dto.PostResponseDto;
@@ -48,5 +51,18 @@ public class PostServiceImpl implements PostService {
         ).stream()
                 .map(postConverter::toSimplePostDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deletePost(Long postId, Member member){
+        // 게시글 존재 여부 확인
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+
+        if (!post.getMember().equals(member)) {
+            throw new CustomExceptions.UnauthorizedAccessException("삭제 권한이 없습니다.");
+        }
+        postRepository.delete(post);
     }
 }

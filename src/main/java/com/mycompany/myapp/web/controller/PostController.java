@@ -9,7 +9,6 @@ import com.mycompany.myapp.exception.StatusCode;
 import com.mycompany.myapp.repository.MemberRepository;
 import com.mycompany.myapp.service.PostService;
 import com.mycompany.myapp.web.controller.base.BaseController;
-import com.mycompany.myapp.web.dto.CommentRequestDto;
 import com.mycompany.myapp.web.dto.PostResponseDto;
 import com.mycompany.myapp.web.dto.base.DefaultRes;
 import io.swagger.annotations.Api;
@@ -52,6 +51,23 @@ public class PostController extends BaseController {
             List<PostResponseDto.SimplePostDto> res = postService.getPostsByCategory(category, sort, page, size);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_POST_SUCCESS, res), HttpStatus.OK);
+        } catch (CustomExceptions.testException e) {
+            return handleApiException(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "게시글 삭제 API")
+    @ApiResponse(code = 200, message = "게시글 삭제 성공")
+    @DeleteMapping("/{postId}")
+    public ResponseEntity deletePost(@PathVariable Long postId){
+        try {
+            logger.info("Received request: method={}, path={}, description={}", "DELETE", "/api/post/{post-id}", "게시글 삭제 API");
+
+            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
+            Member member = memberRepository.getByNickname("오리난쟁이");
+            postService.deletePost(postId, member);
+
+            return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.DELETE_POST_SUCCESS), HttpStatus.OK);
         } catch (CustomExceptions.testException e) {
             return handleApiException(e, HttpStatus.BAD_REQUEST);
         }
