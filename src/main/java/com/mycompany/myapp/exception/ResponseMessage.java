@@ -10,4 +10,7 @@ public class ResponseMessage {
     public static final String COMMENT_LIKE_SUCCESS = "댓글 좋아요 성공";
     public static final String COMMENT_UNLIKE_SUCCESS = "댓글 좋아요 취소 성공";
     public static final String DELETE_COMMENT_SUCCESS = "댓글 삭제 성공";
+
+    //report
+    public static final String CREATE_REPORT_SUCCESS = "신고하기 성공";
 }
