@@ -7,7 +7,7 @@ import lombok.Setter;
 
 public class CommentRequestDto {
 
-    @Getter @Setter
+    @Getter
     public static class CreateCommentDto{
         @ApiParam(name = "Post ID", value = "게시글 ID 입력", required = true)
         @ApiModelProperty(example = "1")
