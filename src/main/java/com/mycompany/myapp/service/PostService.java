@@ -6,6 +6,7 @@ import com.mycompany.myapp.domain.enums.LikeResult;
 import com.mycompany.myapp.domain.enums.SortType;
 import com.mycompany.myapp.web.dto.PostRequestDto;
 import com.mycompany.myapp.web.dto.PostResponseDto;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,4 +16,5 @@ public interface PostService {
     PostResponseDto.PostDetailDto getPostDetail(Long postId, Member member);
     LikeResult togglePostLike(Long postId, Member member);
     void updatePost(Long postId, Member member, PostRequestDto.UpdatePostDto request);
+    void createPost(PostRequestDto.CreatePostRequest request, List<MultipartFile> images, Member member);
 }

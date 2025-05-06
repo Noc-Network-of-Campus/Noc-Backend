@@ -6,17 +6,37 @@ import com.mycompany.myapp.domain.enums.Category;
 import com.mycompany.myapp.domain.enums.LikeResult;
 import com.mycompany.myapp.domain.enums.SortType;
 import com.mycompany.myapp.exception.CustomExceptions;
+import com.mycompany.myapp.exception.ResponseMessage;
+import com.mycompany.myapp.exception.StatusCode;
+import com.mycompany.myapp.repository.ImageRepository;
 import com.mycompany.myapp.repository.PostLikeRepository;
 import com.mycompany.myapp.repository.PostRepository;
 import com.mycompany.myapp.service.PostService;
+import com.mycompany.myapp.util.S3Uploader;
 import com.mycompany.myapp.web.dto.PostRequestDto;
 import com.mycompany.myapp.web.dto.PostResponseDto;
+import com.mycompany.myapp.web.dto.base.DefaultRes;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +49,8 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final PostConverter postConverter;
     private final PostLikeRepository postLikeRepository;
+    private final S3Uploader s3Uploader;
+    private final ImageRepository imageRepository;
 
     // 카테고리 + 정렬 기준에 따라 게시글 목록을 페이징 조회
     @Override
@@ -123,5 +145,42 @@ public class PostServiceImpl implements PostService {
                 : Category.FREE;
 
         post.updatePost(title, content, category);
+    }
+
+    @Override
+    @Transactional
+    public void createPost(PostRequestDto.CreatePostRequest request, List<MultipartFile> images, Member member) {
+        // 카테고리 null 이면 FREE
+        Category category = request.getCategory() != null
+                ? Category.valueOf(request.getCategory())
+                : Category.FREE;
+
+        if (request.getLatitude() == null || request.getLongitude() == null) {
+            throw new IllegalArgumentException("위도/경도 값이 누락되었습니다.");
+        }
+
+        // Point 생성
+        Point location = new GeometryFactory(new PrecisionModel(), 4326)
+                .createPoint(new Coordinate(request.getLongitude(), request.getLatitude()));
+        location.setSRID(4326);
+
+        Post post = postConverter.toPost(request, category, location, member);
+
+        postRepository.save(post);
+
+        // 이미지 저장 (순서대로)
+        if (images != null && !images.isEmpty()) {
+            List<Image> imageEntities = new ArrayList<>();
+            for (int i = 0; i < images.size(); i++) {
+                String imageUrl = s3Uploader.upload(images.get(i), "post"); // S3 업로드
+                Image image = Image.builder()
+                        .post(post)
+                        .imageUrl(imageUrl)
+                        .sortOrder(i)
+                        .build();
+                imageEntities.add(image);
+            }
+            imageRepository.saveAll(imageEntities);
+        }
     }
 }
