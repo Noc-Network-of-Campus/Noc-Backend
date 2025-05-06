@@ -5,6 +5,7 @@ import com.mycompany.myapp.domain.enums.Category;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class PostResponseDto {
 
@@ -23,4 +24,20 @@ public class PostResponseDto {
         private LocalDateTime createdAt;
     }
 
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PostDetailDto{
+        private Long postId;
+        private String title;
+        private String content;
+        private Integer likeCount;
+        private Integer commentCount;
+        private String category;
+        private List<String> images;
+        private Boolean isMyPost;
+        private List<CommentResponseDto.CommentDetailDto> comments;
+        private LocalDateTime createdAt;
+    }
 }
