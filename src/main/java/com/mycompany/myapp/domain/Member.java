@@ -1,6 +1,8 @@
 package com.mycompany.myapp.domain;
 
 import com.mycompany.myapp.domain.base.BaseEntity;
+import com.mycompany.myapp.domain.enums.Gender;
+
 import lombok.*;
 
 import javax.persistence.*;
@@ -17,8 +19,13 @@ public class Member extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
     private String nickname;
 
     private String profileUrl;
+
+    @Column(nullable = false)
+    private Boolean isRegistered;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 }
