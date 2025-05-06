@@ -1,8 +1,6 @@
 package com.mycompany.myapp.converter;
 
-import com.mycompany.myapp.domain.Image;
-import com.mycompany.myapp.domain.Member;
-import com.mycompany.myapp.domain.Post;
+import com.mycompany.myapp.domain.*;
 import com.mycompany.myapp.web.dto.CommentResponseDto;
 import com.mycompany.myapp.web.dto.PostResponseDto;
 import lombok.RequiredArgsConstructor;
@@ -65,8 +63,17 @@ public class PostConverter {
                 .category(post.getCategory().name())
                 .images(imageUrls)
                 .isMyPost(post.getMember().getId().equals(member.getId()))
+                .isLiked(post.getPostLikes().stream()
+                        .anyMatch(like -> like.getMember().getId().equals(member.getId())))
                 .comments(commentDtos)
                 .createdAt(post.getCreatedAt())
+                .build();
+    }
+
+    public PostLike toPostLike(Post post, Member member){
+        return PostLike.builder()
+                .post(post)
+                .member(member)
                 .build();
     }
 }

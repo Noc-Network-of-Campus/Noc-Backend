@@ -2,6 +2,7 @@ package com.mycompany.myapp.web.controller;
 
 import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.domain.enums.Category;
+import com.mycompany.myapp.domain.enums.LikeResult;
 import com.mycompany.myapp.domain.enums.SortType;
 import com.mycompany.myapp.exception.CustomExceptions;
 import com.mycompany.myapp.exception.ResponseMessage;
@@ -86,6 +87,27 @@ public class PostController extends BaseController {
             PostResponseDto.PostDetailDto res = postService.getPostDetail(postId, member);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_POST_SUCCESS, res), HttpStatus.OK);
+        } catch (CustomExceptions.testException e) {
+            return handleApiException(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "게시글 좋아요/취소 API")
+    @ApiResponse(code = 200, message = "게시글 좋아요/취소 성공")
+    @PostMapping("/{postId}/like")
+    public ResponseEntity togglePostLike(@PathVariable Long postId){
+        try {
+            logger.info("Received request: method={}, path={}, description={}", "POST", "/api/post/{post-id}/like", "게시글 좋아요/취소 API");
+
+            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
+            Member member = memberRepository.getByNickname("오리난쟁이");
+            LikeResult result = postService.togglePostLike(postId, member);
+
+            String message = (result == LikeResult.LIKED)
+                    ? ResponseMessage.POST_LIKE_SUCCESS
+                    : ResponseMessage.POST_UNLIKE_SUCCESS;
+
+            return new ResponseEntity( DefaultRes.res(StatusCode.OK, message), HttpStatus.OK);
         } catch (CustomExceptions.testException e) {
             return handleApiException(e, HttpStatus.BAD_REQUEST);
         }

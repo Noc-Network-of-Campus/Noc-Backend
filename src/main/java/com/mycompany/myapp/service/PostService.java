@@ -2,6 +2,7 @@ package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.domain.enums.Category;
+import com.mycompany.myapp.domain.enums.LikeResult;
 import com.mycompany.myapp.domain.enums.SortType;
 import com.mycompany.myapp.web.dto.PostResponseDto;
 
@@ -11,4 +12,5 @@ public interface PostService {
     List<PostResponseDto.SimplePostDto> getPostsByCategory(Category category, SortType sort, Integer page, Integer size);
     void deletePost(Long postId, Member member);
     PostResponseDto.PostDetailDto getPostDetail(Long postId, Member member);
+    LikeResult togglePostLike(Long postId, Member member);
 }

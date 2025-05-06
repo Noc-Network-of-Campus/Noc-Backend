@@ -37,6 +37,7 @@ public class PostResponseDto {
         private String category;
         private List<String> images;
         private Boolean isMyPost;
+        private Boolean isLiked;
         private List<CommentResponseDto.CommentDetailDto> comments;
         private LocalDateTime createdAt;
     }
