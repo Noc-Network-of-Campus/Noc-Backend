@@ -21,21 +21,21 @@ import com.mycompany.myapp.web.dto.base.DefaultRes;
 @Api(tags = "댓글 관련 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/comments")
+@RequestMapping("/api")
 public class CommentController extends BaseController {
     private final CommentService commentService;
     private final MemberRepository memberRepository;
 
     @ApiOperation(value = "댓글 작성 API")
     @ApiResponse(code = 200, message = "댓글 작성 성공")
-    @PostMapping
-    public ResponseEntity createComment(@RequestBody CommentRequestDto.CreateCommentDto request){
+    @PostMapping("/post/{postId}/comments")
+    public ResponseEntity createComment(@RequestBody CommentRequestDto.CreateCommentDto request, @PathVariable Long postId){
         try {
-            logger.info("Received request: method={}, path={}, description={}", "POST", "/api/comments", "댓글 작성 API");
+            logger.info("Received request: method={}, path={}, description={}", "POST", "/api/post/{postId}/comments", "댓글 작성 API");
 
             // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
             Member member = memberRepository.getByNickname("오리난쟁이");
-            commentService.createComment(request, member);
+            commentService.createComment(request, postId, member);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.CREATE_COMMENT_SUCCESS), HttpStatus.OK);
         } catch (CustomExceptions.testException e) {
@@ -45,10 +45,10 @@ public class CommentController extends BaseController {
 
     @ApiOperation(value = "댓글 좋아요/취소 API")
     @ApiResponse(code = 200, message = "댓글 좋아요/취소 성공")
-    @PostMapping("/{commentId}/like")
-    public ResponseEntity toggleCommentLike(@PathVariable Long commentId){
+    @PostMapping("/post/{postId}/comments/{commentId}/like")
+    public ResponseEntity toggleCommentLike(@PathVariable Long postId, @PathVariable Long commentId){
         try {
-            logger.info("Received request: method={}, path={}, description={}", "POST", "/api/comments/{comment-id}/like", "댓글 좋아요/취소 API");
+            logger.info("Received request: method={}, path={}, description={}", "POST", "/api/post/{postId}/comments/{commentId}/like", "댓글 좋아요/취소 API");
 
             // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
             Member member = memberRepository.getByNickname("오리난쟁이");
@@ -66,10 +66,10 @@ public class CommentController extends BaseController {
 
     @ApiOperation(value = "댓글 삭제 API")
     @ApiResponse(code = 200, message = "댓글 삭제 성공")
-    @DeleteMapping("/{commentId}")
-    public ResponseEntity deleteComment(@PathVariable Long commentId){
+    @DeleteMapping("/post/{postId}/comments/{commentId}")
+    public ResponseEntity deleteComment(@PathVariable Long postId, @PathVariable Long commentId){
         try {
-            logger.info("Received request: method={}, path={}, description={}", "DELETE", "/api/comments/{comment-id}", "댓글 삭제 API");
+            logger.info("Received request: method={}, path={}, description={}", "DELETE", "/api/post/{postId}/comments/{commentId}", "댓글 삭제 API");
 
             // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
             Member member = memberRepository.getByNickname("오리난쟁이");

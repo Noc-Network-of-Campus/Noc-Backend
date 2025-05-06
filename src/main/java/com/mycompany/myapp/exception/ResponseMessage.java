@@ -24,4 +24,6 @@ public class ResponseMessage {
     public static final String CREATE_POST_SUCCESS = "게시글 작성 성공";
     public static final String SEARCH_POST_SUCCESS = "게시글 검색 성공";
 
+    //map
+    public static final String READ_MAP_SUCCESS = "카테고리별 지도 조회 성공";
 }

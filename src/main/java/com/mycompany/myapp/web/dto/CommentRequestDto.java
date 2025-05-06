@@ -9,10 +9,6 @@ public class CommentRequestDto {
 
     @Getter
     public static class CreateCommentDto{
-        @ApiParam(name = "Post ID", value = "게시글 ID 입력", required = true)
-        @ApiModelProperty(example = "1")
-        private Long postId;
-
         @ApiParam(name = "Parent Comment ID", value = "부모 댓글 ID 입력")
         @ApiModelProperty(example = "1")
         private Long parentCommentId;
