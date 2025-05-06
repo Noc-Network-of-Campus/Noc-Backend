@@ -1,6 +1,7 @@
 package com.mycompany.myapp.converter;
 
 import com.mycompany.myapp.domain.Comment;
+import com.mycompany.myapp.domain.CommentLike;
 import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.domain.Post;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,13 @@ public class CommentConverter {
                 .content(content)
                 .parentComment(parent)
                 .likeCount(0)
+                .build();
+    }
+
+    public CommentLike toCommentLike(Comment comment, Member member){
+        return CommentLike.builder()
+                .comment(comment)
+                .member(member)
                 .build();
     }
 }

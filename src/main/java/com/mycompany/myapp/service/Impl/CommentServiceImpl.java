@@ -2,8 +2,11 @@ package com.mycompany.myapp.service.Impl;
 
 import com.mycompany.myapp.converter.CommentConverter;
 import com.mycompany.myapp.domain.Comment;
+import com.mycompany.myapp.domain.CommentLike;
 import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.domain.Post;
+import com.mycompany.myapp.domain.enums.CommentLikeResult;
+import com.mycompany.myapp.repository.CommentLikeRepository;
 import com.mycompany.myapp.repository.CommentRepository;
 import com.mycompany.myapp.repository.PostRepository;
 import com.mycompany.myapp.service.CommentService;
@@ -12,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -19,6 +24,7 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final CommentConverter commentConverter;
+    private final CommentLikeRepository commentLikeRepository;
 
     @Override
     @Transactional
@@ -46,6 +52,30 @@ public class CommentServiceImpl implements CommentService {
 
         // Post 댓글 수 증가
         post.increaseCommentCount();
+    }
+
+    @Override
+    @Transactional
+    public CommentLikeResult toggleCommentLike(Long commentId, Member member){
+        // 댓글 존재 여부 확인
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+
+        // 댓글 좋아요 여부 확인
+        Optional<CommentLike> existingLike = commentLikeRepository.findByCommentAndMember(comment, member);
+
+        // 좋아요 눌렀으면 취소
+        if (existingLike.isPresent()) {
+            commentLikeRepository.delete(existingLike.get());
+            comment.decreaseLikeCount();
+            return CommentLikeResult.UNLIKED;
+        } else {
+            // 아닌 경우 좋아요
+            CommentLike like = commentConverter.toCommentLike(comment, member);
+            commentLikeRepository.save(like);
+            comment.increaseLikeCount();
+            return CommentLikeResult.LIKED;
+        }
     }
 }
 
