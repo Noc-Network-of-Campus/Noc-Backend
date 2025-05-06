@@ -5,7 +5,7 @@ import com.mycompany.myapp.domain.Comment;
 import com.mycompany.myapp.domain.CommentLike;
 import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.domain.Post;
-import com.mycompany.myapp.domain.enums.CommentLikeResult;
+import com.mycompany.myapp.domain.enums.LikeResult;
 import com.mycompany.myapp.exception.CustomExceptions;
 import com.mycompany.myapp.repository.CommentLikeRepository;
 import com.mycompany.myapp.repository.CommentRepository;
@@ -61,7 +61,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public CommentLikeResult toggleCommentLike(Long commentId, Member member){
+    public LikeResult toggleCommentLike(Long commentId, Member member){
         // 댓글 존재 여부 확인
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
@@ -78,13 +78,13 @@ public class CommentServiceImpl implements CommentService {
         if (existingLike.isPresent()) {
             commentLikeRepository.delete(existingLike.get());
             comment.decreaseLikeCount();
-            return CommentLikeResult.UNLIKED;
+            return LikeResult.UNLIKED;
         } else {
             // 아닌 경우 좋아요
             CommentLike like = commentConverter.toCommentLike(comment, member);
             commentLikeRepository.save(like);
             comment.increaseLikeCount();
-            return CommentLikeResult.LIKED;
+            return LikeResult.LIKED;
         }
     }
 

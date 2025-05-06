@@ -1,7 +1,7 @@
 package com.mycompany.myapp.web.controller;
 
 import com.mycompany.myapp.domain.Member;
-import com.mycompany.myapp.domain.enums.CommentLikeResult;
+import com.mycompany.myapp.domain.enums.LikeResult;
 import com.mycompany.myapp.exception.ResponseMessage;
 import com.mycompany.myapp.exception.StatusCode;
 import com.mycompany.myapp.repository.MemberRepository;
@@ -52,9 +52,9 @@ public class CommentController extends BaseController {
 
             // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
             Member member = memberRepository.getByNickname("오리난쟁이");
-            CommentLikeResult result = commentService.toggleCommentLike(commentId, member);
+            LikeResult result = commentService.toggleCommentLike(commentId, member);
 
-            String message = (result == CommentLikeResult.LIKED)
+            String message = (result == LikeResult.LIKED)
                     ? ResponseMessage.COMMENT_LIKE_SUCCESS
                     : ResponseMessage.COMMENT_UNLIKE_SUCCESS;
 

@@ -1,5 +1,5 @@
 package com.mycompany.myapp.domain.enums;
 
-public enum CommentLikeResult {
+public enum LikeResult {
     LIKED, UNLIKED
 }
