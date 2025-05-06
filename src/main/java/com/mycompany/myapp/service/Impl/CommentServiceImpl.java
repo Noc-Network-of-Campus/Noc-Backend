@@ -106,6 +106,7 @@ public class CommentServiceImpl implements CommentService {
 
         comment.setIsDeleted();
 
+        // 댓글수 반영
         Post post = comment.getPost();
         post.decreaseCommentCount();
     }
