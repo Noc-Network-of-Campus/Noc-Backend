@@ -6,6 +6,7 @@ import com.mycompany.myapp.domain.CommentLike;
 import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.domain.Post;
 import com.mycompany.myapp.domain.enums.CommentLikeResult;
+import com.mycompany.myapp.exception.CustomExceptions;
 import com.mycompany.myapp.repository.CommentLikeRepository;
 import com.mycompany.myapp.repository.CommentRepository;
 import com.mycompany.myapp.repository.PostRepository;
@@ -14,7 +15,6 @@ import com.mycompany.myapp.web.dto.CommentRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Optional;
 
 @Service
@@ -44,6 +44,11 @@ public class CommentServiceImpl implements CommentService {
             if (parent.getParentComment() != null){
                 throw new IllegalArgumentException("댓글은 1-depth까지만 작성할 수 있습니다.");
             }
+
+            // 삭제된 댓글에는 대댓글 작성 x
+            if (Boolean.TRUE.equals(parent.getIsDeleted())){
+                throw new IllegalArgumentException("삭제된 댓글에는 대댓글을 작성할 수 없습니다.");
+            }
         }
 
         // 댓글 엔티티 생성 및 저장
@@ -61,6 +66,11 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
 
+        // 삭제된 댓글 좋아요 x
+        if (Boolean.TRUE.equals(comment.getIsDeleted())) {
+            throw new IllegalArgumentException("삭제된 댓글에는 좋아요를 누를 수 없습니다.");
+        }
+
         // 댓글 좋아요 여부 확인
         Optional<CommentLike> existingLike = commentLikeRepository.findByCommentAndMember(comment, member);
 
@@ -76,6 +86,29 @@ public class CommentServiceImpl implements CommentService {
             comment.increaseLikeCount();
             return CommentLikeResult.LIKED;
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteComment(Long commentId, Member member){
+        // 댓글 존재 여부 확인
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+
+        if (!comment.getMember().equals(member)) {
+            throw new CustomExceptions.UnauthorizedAccessException("삭제 권한이 없습니다.");
+        }
+
+        // 이미 삭제된 댓글은 다시 삭제 x
+        if (Boolean.TRUE.equals(comment.getIsDeleted())) {
+            throw new IllegalArgumentException("이미 삭제된 댓글입니다.");
+        }
+
+        comment.setIsDeleted();
+
+        // 댓글수 반영
+        Post post = comment.getPost();
+        post.decreaseCommentCount();
     }
 }
 

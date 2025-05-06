@@ -52,4 +52,10 @@ public class Post extends BaseEntity {
             this.commentCount += 1;
         }
     }
+
+    public void decreaseCommentCount(){
+        if (this.commentCount > 0) {
+            this.commentCount--;
+        }
+    }
 }

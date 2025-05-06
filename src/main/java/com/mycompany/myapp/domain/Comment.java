@@ -30,6 +30,9 @@ public class Comment extends BaseEntity {
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentLike> commentLikes;
 
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
     private String content;
     private Integer likeCount;
 
@@ -39,5 +42,9 @@ public class Comment extends BaseEntity {
 
     public void decreaseLikeCount() {
         this.likeCount = (this.likeCount == null || this.likeCount <= 0) ? 0 : this.likeCount - 1;
+    }
+
+    public void setIsDeleted(){
+        this.isDeleted = true;
     }
 }
