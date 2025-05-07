@@ -9,10 +9,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import com.mycompany.myapp.config.security.handler.CustomOAuth2SuccessHandler;
+import com.mycompany.myapp.config.security.handler.JwtAccessDeniedHandler;
+import com.mycompany.myapp.config.security.handler.JwtAuthenticationEntryPoint;
+import com.mycompany.myapp.config.security.provider.JwtProvider;
 import com.mycompany.myapp.service.CustomOAuth2UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,9 +27,17 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+	private final JwtProvider jwtProvider;
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+	public JwtFilter jwtFilter() {
+		return new JwtFilter(jwtProvider, jwtAuthenticationEntryPoint);
+	}
+
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
 		http
 			.cors(cors -> cors.configurationSource(new CorsConfigurationSource() {
 				@Override
@@ -43,11 +55,25 @@ public class SecurityConfig {
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.sessionManagement((session) -> session
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+			.exceptionHandling(exception -> exception
+				.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+				.accessDeniedHandler(jwtAccessDeniedHandler)
+			)
+			.authorizeHttpRequests(request -> request
+				.antMatchers(
+					"/swagger-ui.html",
+					"/swagger-ui/**",
+					"/v2/api-docs",
+					"/v3/api-docs",
+					"/swagger-resources/**",
+					"/webjars/**"
+				).permitAll()
+				.anyRequest().authenticated())
 			.oauth2Login(oauth2 -> oauth2
 				.userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
 				.successHandler(customOAuth2SuccessHandler)
-			);
-
+			)
+			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 	}
