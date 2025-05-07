@@ -19,8 +19,10 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -126,6 +128,25 @@ public class PostController extends BaseController {
             postService.updatePost(postId, member, request);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.UPDATE_POST_SUCCESS), HttpStatus.OK);
+        } catch (CustomExceptions.testException e) {
+            return handleApiException(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "게시글 작성 API")
+    @ApiResponse(code = 200, message = "게시글 작성 성공")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity createPost(@ModelAttribute PostRequestDto.CreatePostRequest request,
+                                     @RequestPart(value = "images", required = false) List<MultipartFile> images){
+        try {
+            logger.info("Received request: method={}, path={}, description={}", "POST", "/api/post", "게시글 작성 API");
+
+            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
+            Member member = memberRepository.getByNickname("오리난쟁이");
+
+            postService.createPost(request, images, member);
+
+            return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.CREATE_POST_SUCCESS), HttpStatus.OK);
         } catch (CustomExceptions.testException e) {
             return handleApiException(e, HttpStatus.BAD_REQUEST);
         }
