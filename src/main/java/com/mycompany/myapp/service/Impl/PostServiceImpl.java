@@ -94,6 +94,9 @@ public class PostServiceImpl implements PostService {
             throw new CustomExceptions.UnauthorizedAccessException("삭제 권한이 없습니다.");
         }
         postRepository.delete(post);
+
+        // ES 삭제
+        postSearchRepository.deleteById(postId);
     }
 
     @Override
@@ -149,6 +152,13 @@ public class PostServiceImpl implements PostService {
                 : Category.FREE;
 
         post.updatePost(title, content, category);
+
+        // ES 업데이트
+        PostDocument doc = postConverter.toPostDoc(title, post.getId());
+        try {
+            postSearchRepository.save(doc);
+        } catch (Exception e) {
+        }
     }
 
     @Override

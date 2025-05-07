@@ -28,9 +28,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public void createComment(CommentRequestDto.CreateCommentDto request, Member member) {
+    public void createComment(CommentRequestDto.CreateCommentDto request, Long postId, Member member) {
         // 게시글 존재 여부 확인
-        Post post = postRepository.findById(request.getPostId())
+        Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
 
         Comment parent = null;
