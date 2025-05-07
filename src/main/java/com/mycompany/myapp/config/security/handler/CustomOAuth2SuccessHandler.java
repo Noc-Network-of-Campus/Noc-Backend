@@ -37,12 +37,8 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 			(Long) user.getAttributes().get("memberId")
 		);
 
-
-
-		response.setContentType("application/json;charset=UTF-8");
-		response
-			.getWriter()
-			.write("{\"accessToken\": \"" + jwt + "\", \"refreshToken\": \"" + refreshToken + "\"}");
+		String redirectUrl = "http://localhost:3000/oauth2/redirect?accessToken=" + jwt + "&refreshToken=" + refreshToken;
+		response.sendRedirect(redirectUrl);
 	}
 
 }
