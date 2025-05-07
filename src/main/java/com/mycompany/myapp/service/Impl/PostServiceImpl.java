@@ -219,7 +219,7 @@ public class PostServiceImpl implements PostService {
 
         List<Post> posts = postRepository.findAllById(postIds);
 
-        // 최신순 정렬 유지 (DB 조회 시 순서 무작위일 수 있음 → 정렬 복구 필요)
+        // 최신순 정렬
         Map<Long, Post> postMap = posts.stream().collect(Collectors.toMap(Post::getId, p -> p));
         return postIds.stream()
                 .map(postMap::get)
