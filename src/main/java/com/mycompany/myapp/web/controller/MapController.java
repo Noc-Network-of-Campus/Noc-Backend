@@ -8,6 +8,7 @@ import com.mycompany.myapp.exception.ResponseMessage;
 import com.mycompany.myapp.exception.StatusCode;
 import com.mycompany.myapp.repository.MemberRepository;
 import com.mycompany.myapp.service.MapService;
+import com.mycompany.myapp.service.MemberService;
 import com.mycompany.myapp.service.PostService;
 import com.mycompany.myapp.web.controller.base.BaseController;
 import com.mycompany.myapp.web.dto.MapResponseDto;
@@ -33,8 +34,8 @@ import java.util.List;
 @RequestMapping("/api/map")
 public class MapController extends BaseController {
 
-    private final MemberRepository memberRepository;
     private final MapService mapService;
+    private final MemberService memberService;
 
     @ApiOperation(value = "카테고리별 지도 조회 API")
     @ApiResponse(code = 200, message = "카테고리별 지도 조회 성공")
@@ -50,8 +51,7 @@ public class MapController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "GET", "/api/map", "카테고리별 지도 조회 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
 
             List<MapResponseDto.MapPinDto> res = mapService.getPinsByCategoryAndLocation(category, latitude, longitude);
 
@@ -68,8 +68,7 @@ public class MapController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "GET", "/api/map/pins", "핀 리스트 조회 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
 
             List<PostResponseDto.SimplePostDto> res = mapService.getPinsByIds(ids);
 

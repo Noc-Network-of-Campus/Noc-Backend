@@ -6,6 +6,7 @@ import com.mycompany.myapp.exception.ResponseMessage;
 import com.mycompany.myapp.exception.StatusCode;
 import com.mycompany.myapp.repository.MemberRepository;
 import com.mycompany.myapp.service.CommentService;
+import com.mycompany.myapp.service.MemberService;
 import com.mycompany.myapp.web.controller.base.BaseController;
 import com.mycompany.myapp.web.dto.CommentRequestDto;
 import io.swagger.annotations.Api;
@@ -24,7 +25,7 @@ import com.mycompany.myapp.web.dto.base.DefaultRes;
 @RequestMapping("/api")
 public class CommentController extends BaseController {
     private final CommentService commentService;
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
 
     @ApiOperation(value = "댓글 작성 API")
     @ApiResponse(code = 200, message = "댓글 작성 성공")
@@ -33,8 +34,7 @@ public class CommentController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "POST", "/api/post/{postId}/comments", "댓글 작성 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
             commentService.createComment(request, postId, member);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.CREATE_COMMENT_SUCCESS), HttpStatus.OK);
@@ -50,8 +50,7 @@ public class CommentController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "POST", "/api/post/{postId}/comments/{commentId}/like", "댓글 좋아요/취소 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
             LikeResult result = commentService.toggleCommentLike(commentId, member);
 
             String message = (result == LikeResult.LIKED)
@@ -71,8 +70,7 @@ public class CommentController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "DELETE", "/api/post/{postId}/comments/{commentId}", "댓글 삭제 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
             commentService.deleteComment(commentId, member);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.DELETE_COMMENT_SUCCESS), HttpStatus.OK);

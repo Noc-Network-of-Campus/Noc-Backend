@@ -4,7 +4,7 @@ import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.exception.CustomExceptions;
 import com.mycompany.myapp.exception.ResponseMessage;
 import com.mycompany.myapp.exception.StatusCode;
-import com.mycompany.myapp.repository.MemberRepository;
+import com.mycompany.myapp.service.MemberService;
 import com.mycompany.myapp.service.ReportService;
 import com.mycompany.myapp.web.controller.base.BaseController;
 import com.mycompany.myapp.web.dto.ReportRequestDto;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/report")
 public class ReportController extends BaseController {
 
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final ReportService reportService;
 
     @ApiOperation(value = "신고하기 API")
@@ -36,8 +36,7 @@ public class ReportController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "POST", "/api/report", "신고하기 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
             reportService.createReport(request, member);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.CREATE_REPORT_SUCCESS), HttpStatus.OK);

@@ -10,6 +10,7 @@ import com.mycompany.myapp.exception.ResponseMessage;
 import com.mycompany.myapp.exception.StatusCode;
 import com.mycompany.myapp.repository.MemberRepository;
 import com.mycompany.myapp.repository.PostSearchRepository;
+import com.mycompany.myapp.service.MemberService;
 import com.mycompany.myapp.service.PostIndexer;
 import com.mycompany.myapp.service.PostService;
 import com.mycompany.myapp.web.controller.base.BaseController;
@@ -35,7 +36,7 @@ import java.util.List;
 @RequestMapping("/api/post")
 public class PostController extends BaseController {
 
-    private final MemberRepository memberRepository;
+    private final MemberService memberService;
     private final PostService postService;
     private final PostSearchRepository postSearchRepository;
     private final PostIndexer postIndexer;
@@ -54,8 +55,7 @@ public class PostController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/list", "카테고리별 게시글 조회 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
 
             List<PostResponseDto.SimplePostDto> res = postService.getPostsByCategory(category, sort, page, size);
 
@@ -72,8 +72,7 @@ public class PostController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "DELETE", "/api/post/{post-id}", "게시글 삭제 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
             postService.deletePost(postId, member);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.DELETE_POST_SUCCESS), HttpStatus.OK);
@@ -89,8 +88,7 @@ public class PostController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/{post-id}", "게시글 상세 조회 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
 
             PostResponseDto.PostDetailDto res = postService.getPostDetail(postId, member);
 
@@ -107,8 +105,7 @@ public class PostController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "POST", "/api/post/{post-id}/like", "게시글 좋아요/취소 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
             LikeResult result = postService.togglePostLike(postId, member);
 
             String message = (result == LikeResult.LIKED)
@@ -128,8 +125,7 @@ public class PostController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "PUT", "/api/post/{post-id}", "게시글 수정 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
             postService.updatePost(postId, member, request);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.UPDATE_POST_SUCCESS), HttpStatus.OK);
@@ -146,8 +142,7 @@ public class PostController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "POST", "/api/post", "게시글 작성 API");
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
 
             postService.createPost(request, images, member);
 
@@ -174,8 +169,7 @@ public class PostController extends BaseController {
             //elasticsearch 마이그레이션
             // postIndexer.migrateToElasticsearch();
 
-            // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
-            Member member = memberRepository.getByNickname("오리난쟁이");
+            Member member = memberService.getCurrentMember();
 
             List<PostResponseDto.SimplePostDto> res = postService.searchByTitle(keyword, page, size);
 
