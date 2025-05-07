@@ -18,16 +18,27 @@ spring:
       max-request-size: 20MB
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         show_sql: true
         format_sql: true
         dialect: org.hibernate.spatial.dialect.mysql.MySQL8SpatialDialect
         use_sql_comments: false
-        hbm2ddl:
-          auto: update
         default_batch_fetch_size: 1000
+  jwt:
+    token:
+      secret: ${JWT_TOKEN_SECRET}
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - profile
+              - email
   data:
     elasticsearch:
       rest:

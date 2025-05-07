@@ -172,7 +172,7 @@ public class PostController extends BaseController {
             logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/search?keyword={keyword}", "게시글 검색 API");
 
             //elasticsearch 마이그레이션
-            //postIndexer.migrateToElasticsearch();
+            // postIndexer.migrateToElasticsearch();
 
             // 임시 : 닉네임으로 유저 조회 (추후 JWT 기반 인증 연동 예정)
             Member member = memberRepository.getByNickname("오리난쟁이");
