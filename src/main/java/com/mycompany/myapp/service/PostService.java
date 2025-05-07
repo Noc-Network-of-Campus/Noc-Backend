@@ -17,4 +17,5 @@ public interface PostService {
     LikeResult togglePostLike(Long postId, Member member);
     void updatePost(Long postId, Member member, PostRequestDto.UpdatePostDto request);
     void createPost(PostRequestDto.CreatePostRequest request, List<MultipartFile> images, Member member);
+    List<PostResponseDto.SimplePostDto> searchByTitle(String keyword, Integer page, Integer size);
 }

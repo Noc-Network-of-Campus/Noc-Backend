@@ -11,6 +11,7 @@ import com.mycompany.myapp.exception.StatusCode;
 import com.mycompany.myapp.repository.ImageRepository;
 import com.mycompany.myapp.repository.PostLikeRepository;
 import com.mycompany.myapp.repository.PostRepository;
+import com.mycompany.myapp.repository.PostSearchRepository;
 import com.mycompany.myapp.service.PostService;
 import com.mycompany.myapp.util.S3Uploader;
 import com.mycompany.myapp.web.dto.PostRequestDto;
@@ -23,6 +24,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -51,6 +54,7 @@ public class PostServiceImpl implements PostService {
     private final PostLikeRepository postLikeRepository;
     private final S3Uploader s3Uploader;
     private final ImageRepository imageRepository;
+    private final PostSearchRepository postSearchRepository;
 
     // 카테고리 + 정렬 기준에 따라 게시글 목록을 페이징 조회
     @Override
@@ -165,8 +169,13 @@ public class PostServiceImpl implements PostService {
         location.setSRID(4326);
 
         Post post = postConverter.toPost(request, category, location, member);
-
         postRepository.save(post);
+
+        PostDocument document = postConverter.toPostDocument(post);
+        try {
+            postSearchRepository.save(document);
+        } catch (Exception e) {
+        }
 
         // 이미지 저장 (순서대로)
         if (images != null && !images.isEmpty()) {
@@ -182,5 +191,29 @@ public class PostServiceImpl implements PostService {
             }
             imageRepository.saveAll(imageEntities);
         }
+    }
+
+    @Override
+    public List<PostResponseDto.SimplePostDto> searchByTitle(String keyword, Integer page, Integer size) {
+        if (page < 1) throw new IllegalArgumentException("페이지는 1부터 시작합니다.");
+        if (size < 1) throw new IllegalArgumentException("size는 1 이상이어야 합니다.");
+
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "id")); // 최신순
+
+        // 페이징 + 정렬 검색
+        Page<PostDocument> pageDocs = postSearchRepository.findByTitleContaining(keyword, pageable);
+
+        List<Long> postIds = pageDocs.getContent().stream()
+                .map(PostDocument::getId)
+                .collect(Collectors.toList());
+
+        List<Post> posts = postRepository.findAllById(postIds);
+
+        // 최신순 정렬 유지 (DB 조회 시 순서 무작위일 수 있음 → 정렬 복구 필요)
+        Map<Long, Post> postMap = posts.stream().collect(Collectors.toMap(Post::getId, p -> p));
+        return postIds.stream()
+                .map(postMap::get)
+                .map(postConverter::toSimplePostDto)
+                .collect(Collectors.toList());
     }
 }

@@ -22,5 +22,6 @@ public class ResponseMessage {
     public static final String POST_UNLIKE_SUCCESS = "게시글 좋아요 취소 성공";
     public static final String UPDATE_POST_SUCCESS = "게시글 수정 성공";
     public static final String CREATE_POST_SUCCESS = "게시글 작성 성공";
+    public static final String SEARCH_POST_SUCCESS = "게시글 검색 성공";
 
 }

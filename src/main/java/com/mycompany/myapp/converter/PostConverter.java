@@ -30,6 +30,16 @@ public class PostConverter {
                 .build();
     }
 
+    public PostDocument toPostDocument(Post post){
+                return PostDocument.builder()
+                        .id(post.getId())
+                        .title(post.getTitle())
+//                        .content(post.getContent())
+//                        .category(post.getCategory().name())
+//                        .createdAt(post.getCreatedAt())
+                        .build();
+    }
+
     public PostResponseDto.SimplePostDto toSimplePostDto(Post post) {
         return PostResponseDto.SimplePostDto.builder()
                 .postId(post.getId())
