@@ -16,7 +16,7 @@ public class PostIndexer {
     private final PostRepository postRepository;
     private final PostSearchRepository postSearchRepository;
 
-    public void ㅇmigrateToElasticsearch() {
+    public void migrateToElasticsearch() {
         List<Post> posts = postRepository.findAll();
         List<PostDocument> docs = posts.stream()
                 .map(post -> PostDocument.builder()
