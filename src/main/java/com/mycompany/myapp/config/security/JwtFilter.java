@@ -64,7 +64,8 @@ public class JwtFilter extends OncePerRequestFilter {
 			uri.startsWith("/swagger-resources") ||
 			uri.startsWith("/webjars") ||
 			uri.startsWith("/login") ||
-			uri.startsWith("/oauth2");
+			uri.startsWith("/oauth2") ||
+			uri.startsWith("/api/auth/reissue");
 	}
 
 	private String resolveToken(HttpServletRequest request) {

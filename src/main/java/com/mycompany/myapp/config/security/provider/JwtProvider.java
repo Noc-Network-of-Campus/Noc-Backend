@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.mycompany.myapp.config.security.CustomUserDetails;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -77,6 +78,7 @@ public class JwtProvider implements InitializingBean {
 		Long memberId = claims.get("memberId", Long.class);
 		String email = claims.get("email", String.class);
 		Boolean isRegistered = claims.get("isRegistered", Boolean.class);
+		System.out.println("memberId = " + memberId);
 
 		// Authentication 객체를 생성하여 반환
 		UserDetails userDetails = CustomUserDetails.builder()
@@ -100,6 +102,20 @@ public class JwtProvider implements InitializingBean {
 			.getBody();
 		Date expiration = claims.getExpiration();
 		return expiration.before(new Date());
+	}
+
+	public Long getMemberId(String token) {
+		try {
+			Claims claims = Jwts.parserBuilder()
+				.setSigningKey(secretKey)
+				.build()
+				.parseClaimsJws(token)
+				.getBody();
+			return claims.get("memberId", Long.class);
+		} catch (ExpiredJwtException e) {
+			// 만료되었지만 payload는 꺼낼 수 있음
+			return e.getClaims().get("memberId", Long.class);
+		}
 	}
 
 }
