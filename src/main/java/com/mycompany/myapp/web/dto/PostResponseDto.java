@@ -31,6 +31,7 @@ public class PostResponseDto {
     public static class PostDetailDto{
         private Long postId;
         private String title;
+        private String nickname;
         private String content;
         private Integer likeCount;
         private Integer commentCount;

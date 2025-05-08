@@ -38,10 +38,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,9 +53,40 @@ public class PostServiceImpl implements PostService {
     private final ImageRepository imageRepository;
     private final PostSearchRepository postSearchRepository;
 
+    @Override
+    public List<PostResponseDto.SimplePostDto> getPostsByCategoryWithCursor(Category category, SortType sort, Long lastPostId, Integer size){
+        if (size < 1) throw new IllegalArgumentException("size는 1 이상이어야 합니다.");
+
+        List<Post> posts;
+
+        Pageable pageable = PageRequest.of(0, size); // 커서 기반 페이징은 항상 0 페이지
+
+        if (sort == SortType.LIKE) {
+            Integer lastLikeCount = null;
+
+            if (lastPostId != null) {
+                Post lastPost = postRepository.findById(lastPostId).orElse(null);
+                if (lastPost == null) return Collections.emptyList();
+                lastLikeCount = lastPost.getLikeCount();
+            }
+
+            posts = (category == null)
+                    ? postRepository.findByCursorLike(lastLikeCount, lastPostId, pageable)
+                    : postRepository.findByCategoryAndCursorLike(category, lastLikeCount, lastPostId, pageable);
+        } else {
+            posts = (category == null)
+                    ? postRepository.findByCursorLatest(lastPostId, pageable)
+                    : postRepository.findByCategoryAndCursorLatest(category, lastPostId, pageable);
+        }
+
+        return posts.stream()
+                .map(postConverter::toSimplePostDto)
+                .collect(Collectors.toList());
+    }
+
     // 카테고리 + 정렬 기준에 따라 게시글 목록을 페이징 조회
     @Override
-    public List<PostResponseDto.SimplePostDto> getPostsByCategory(Category category, SortType sort, Integer page, Integer size){
+    public List<PostResponseDto.SimplePostDto> getPostsByCategoryWithOffest(Category category, SortType sort, Integer page, Integer size){
         if (page < 1) throw new IllegalArgumentException("페이지는 1부터 시작합니다.");
         if (size < 1) throw new IllegalArgumentException("size는 1 이상이어야 합니다.");
 

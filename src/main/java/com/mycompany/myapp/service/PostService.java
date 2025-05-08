@@ -11,7 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface PostService {
-    List<PostResponseDto.SimplePostDto> getPostsByCategory(Category category, SortType sort, Integer page, Integer size);
+    List<PostResponseDto.SimplePostDto> getPostsByCategoryWithCursor(Category category, SortType sort, Long lastPostId, Integer size);
+    List<PostResponseDto.SimplePostDto> getPostsByCategoryWithOffest(Category category, SortType sort, Integer page, Integer size);
     void deletePost(Long postId, Member member);
     PostResponseDto.PostDetailDto getPostDetail(Long postId, Member member);
     LikeResult togglePostLike(Long postId, Member member);

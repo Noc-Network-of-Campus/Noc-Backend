@@ -92,6 +92,7 @@ public class PostConverter {
         return PostResponseDto.PostDetailDto.builder()
                 .postId(post.getId())
                 .title(post.getTitle())
+                .nickname(member.getNickname())
                 .content(post.getContent())
                 .likeCount(post.getLikeCount())
                 .commentCount(post.getCommentCount())

@@ -38,6 +38,7 @@ public class CommentConverter {
 
         return CommentResponseDto.CommentDetailDto.builder()
                 .commentId(comment.getId())
+                .nickname(member.getNickname())
                 .content(isDeleted ? "삭제된 댓글입니다." : comment.getContent())
                 .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
                 .isMyComment(isMyComment)
