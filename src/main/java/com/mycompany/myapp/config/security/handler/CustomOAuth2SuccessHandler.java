@@ -11,6 +11,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import com.mycompany.myapp.config.security.provider.JwtProvider;
+import com.mycompany.myapp.service.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
 	private final JwtProvider jwtProvider;
+	private final AuthService authService;
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request,
@@ -25,17 +27,16 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 		Authentication authentication) throws IOException {
 		OAuth2User user = (OAuth2User) authentication.getPrincipal();
 
+		Long memberId = (Long) user.getAttributes().get("memberId");
+		String email = (String) user.getAttributes().get("email");
+		Boolean isRegistered = (Boolean) user.getAttributes().get("isRegistered");
+
 		//Access Token 생성
-		String jwt = jwtProvider.generateToken(
-			(Long) user.getAttributes().get("memberId"),
-			(String) user.getAttributes().get("email"),
-			(Boolean) user.getAttributes().get("isRegistered")
-		);
+		String jwt = jwtProvider.generateToken(memberId, email, isRegistered);
 
 		//Refresh Token 생성
-		String refreshToken = jwtProvider.generateToken(
-			(Long) user.getAttributes().get("memberId")
-		);
+		String refreshToken = jwtProvider.generateToken(memberId);
+		authService.saveRefreshToken(memberId, refreshToken);
 
 		String redirectUrl = "http://localhost:3000/oauth2/redirect?accessToken=" + jwt + "&refreshToken=" + refreshToken;
 		response.sendRedirect(redirectUrl);
