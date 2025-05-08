@@ -28,7 +28,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = "게시글 관련 API")
 @RestController
@@ -41,10 +43,37 @@ public class PostController extends BaseController {
     private final PostSearchRepository postSearchRepository;
     private final PostIndexer postIndexer;
 
-    @ApiOperation(value = "카테고리별 게시글 조회 API", notes = "카테고리, 정렬 방식, 페이지 번호, 페이지 크기를 기준으로 게시글을 조회합니다.")
+    @ApiOperation(value = "카테고리별 게시글 조회 API", notes = "커서 기반 페이징으로 구현")
     @ApiResponse(code = 200, message = "카테고리별 게시글 불러오기 성공")
-    @GetMapping("/list")
-    public ResponseEntity getPostListByCategory(@ApiParam(value = "카테고리. 없으면 전체 게시글", example = "FOOD")
+    @GetMapping("/list/cursor")
+    public ResponseEntity getPostsByCategoryWithCursor(
+            @ApiParam(value = "카테고리. 없으면 전체 게시글", example = "FOOD") @RequestParam(required = false) Category category,
+            @ApiParam(value = "정렬 방식 (LIKE, LATEST). 기본값은 LATEST", example = "LATEST") @RequestParam(required = false, defaultValue = "LATEST") SortType sort,
+            @ApiParam(value = "마지막 게시글 ID", example = "100") @RequestParam(required = false) Long lastPostId,
+            @ApiParam(value = "한 페이지당 게시글 수", example = "10", required = true) @RequestParam Integer size){
+        try {
+            logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/list", "카테고리별 게시글 조회 API");
+
+            Member member = memberService.getCurrentMember();
+
+            List<PostResponseDto.SimplePostDto> postList = postService.getPostsByCategoryWithCursor(category, sort, lastPostId, size);
+            Long nextCursor = (postList.isEmpty()) ? null : postList.get(postList.size() - 1).getPostId();
+
+            Map<String, Object> res = new HashMap<>();
+            res.put("posts", postList);
+            res.put("nextCursor", nextCursor);
+            res.put("hasNext", postList.size() == size);
+
+            return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_POST_LIST_SUCCESS, res), HttpStatus.OK);
+        } catch (CustomExceptions.testException e) {
+            return handleApiException(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "카테고리별 게시글 조회 API", notes = "Offset 기반 페이징으로 구현")
+    @ApiResponse(code = 200, message = "카테고리별 게시글 불러오기 성공")
+    @GetMapping("/list/page")
+    public ResponseEntity getPostsByCategoryWithOffset(@ApiParam(value = "카테고리. 없으면 전체 게시글", example = "FOOD")
                                                     @RequestParam(required = false) Category category,
                                                 @ApiParam(value = "정렬 방식 (LIKE, LATEST). 기본값은 LATEST", example = "LATEST")
                                                     @RequestParam(required = false, defaultValue = "LATEST") SortType sort,
@@ -57,7 +86,7 @@ public class PostController extends BaseController {
 
             Member member = memberService.getCurrentMember();
 
-            List<PostResponseDto.SimplePostDto> res = postService.getPostsByCategory(category, sort, page, size);
+            List<PostResponseDto.SimplePostDto> res = postService.getPostsByCategoryWithOffest(category, sort, page, size);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_POST_LIST_SUCCESS, res), HttpStatus.OK);
         } catch (CustomExceptions.testException e) {

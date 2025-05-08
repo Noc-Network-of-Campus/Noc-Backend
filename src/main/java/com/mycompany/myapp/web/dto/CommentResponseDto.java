@@ -15,6 +15,7 @@ public class CommentResponseDto {
     @AllArgsConstructor
     public static class CommentDetailDto {
         private Long commentId;
+        private String nickname;
         private String content;
         private Long parentCommentId;
         private Boolean isMyComment;
