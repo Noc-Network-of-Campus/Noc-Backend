@@ -27,4 +27,8 @@ public class Member extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }
