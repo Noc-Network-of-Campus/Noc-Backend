@@ -52,7 +52,7 @@ public class PostController extends BaseController {
             @ApiParam(value = "마지막 게시글 ID", example = "100") @RequestParam(required = false) Long lastPostId,
             @ApiParam(value = "한 페이지당 게시글 수", example = "10", required = true) @RequestParam Integer size){
         try {
-            logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/list", "카테고리별 게시글 조회 API");
+            logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/list/cursor", "카테고리별 게시글 조회 API");
 
             Member member = memberService.getCurrentMember();
 
@@ -82,7 +82,7 @@ public class PostController extends BaseController {
                                                 @ApiParam(value = "한 페이지당 게시글 수", example = "10", required = true)
                                                     @RequestParam Integer size){
         try {
-            logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/list", "카테고리별 게시글 조회 API");
+            logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/list/page", "카테고리별 게시글 조회 API");
 
             Member member = memberService.getCurrentMember();
 
@@ -186,10 +186,8 @@ public class PostController extends BaseController {
     @GetMapping("/search")
     public ResponseEntity searchPosts(@ApiParam(value = "검색 키워드", example = "제목", required = true)
                                           @RequestParam String keyword,
-
-                                      @ApiParam(value = "페이지 번호", example = "1", required = true)
-                                          @RequestParam Integer page,
-
+                                      @ApiParam(value = "마지막 게시글 ID", example = "100")
+                                          @RequestParam(required = false) Long lastPostId,
                                       @ApiParam(value = "한 페이지당 게시글 수", example = "10", required = true)
                                           @RequestParam Integer size){
         try {
@@ -200,9 +198,40 @@ public class PostController extends BaseController {
 
             Member member = memberService.getCurrentMember();
 
-            List<PostResponseDto.SimplePostDto> res = postService.searchByTitle(keyword, page, size);
+            List<PostResponseDto.SimplePostDto> result = postService.searchByTitleWithCursor(keyword, lastPostId, size);
+            Long nextCursor = result.isEmpty() ? null : result.get(result.size() - 1).getPostId();
+
+            Map<String, Object> res = new HashMap<>();
+            res.put("posts", result);
+            res.put("nextCursor", nextCursor);
+            res.put("hasNext", result.size() == size);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.SEARCH_POST_SUCCESS, res), HttpStatus.OK);
+        } catch (CustomExceptions.testException e) {
+            return handleApiException(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @ApiOperation(value = "내 게시글 조회 API", notes = "커서 기반 페이징으로 구현")
+    @ApiResponse(code = 200, message = "내 게시글 불러오기 성공")
+    @GetMapping("/my")
+    public ResponseEntity getMyPostsByCursor(
+            @ApiParam(value = "마지막 게시글 ID", example = "100") @RequestParam(required = false) Long lastPostId,
+            @ApiParam(value = "페이지 크기", example = "10", required = true) @RequestParam Integer size){
+        try {
+            logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/my", "카테고리별 게시글 조회 API");
+
+            Member member = memberService.getCurrentMember();
+
+            List<PostResponseDto.SimplePostDto> postList = postService.getMyPosts(lastPostId, size, member);
+            Long nextCursor = (postList.isEmpty()) ? null : postList.get(postList.size() - 1).getPostId();
+
+            Map<String, Object> res = new HashMap<>();
+            res.put("posts", postList);
+            res.put("nextCursor", nextCursor);
+            res.put("hasNext", postList.size() == size);
+
+            return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_MY_POSTS_SUCCESS, res), HttpStatus.OK);
         } catch (CustomExceptions.testException e) {
             return handleApiException(e, HttpStatus.BAD_REQUEST);
         }
