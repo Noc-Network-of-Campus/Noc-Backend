@@ -20,6 +20,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
+/**
+ * 신고(Report) 관련 요청을 처리하는 REST 컨트롤러
+ * - 게시글 또는 댓글 신고 API 제공
+ */
 @Api(tags = "신고 관련 API")
 @RestController
 @RequiredArgsConstructor
@@ -29,10 +35,16 @@ public class ReportController extends BaseController {
     private final MemberService memberService;
     private final ReportService reportService;
 
+    /**
+     * 게시글 또는 댓글에 대한 신고 등록
+     *
+     * @param request 신고 요청 DTO (신고 대상 ID, 유형, 사유 포함)
+     * @return 신고 성공 응답 (statusCode: 200)
+     */
     @ApiOperation(value = "신고하기 API")
     @ApiResponse(code = 200, message = "신고하기 성공")
     @PostMapping
-    public ResponseEntity createReport(@RequestBody ReportRequestDto request){
+    public ResponseEntity createReport(@Valid @RequestBody ReportRequestDto request){
         try {
             logger.info("Received request: method={}, path={}, description={}", "POST", "/api/report", "신고하기 API");
 

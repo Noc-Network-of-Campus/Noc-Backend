@@ -12,6 +12,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentConverter {
 
+    /**
+     * 댓글 작성 요청을 기반으로 Comment 엔티티 생성
+     *
+     * @param member 댓글 작성자
+     * @param post 댓글이 속한 게시글
+     * @param parent 부모 댓글 (대댓글인 경우, null 가능)
+     * @param content 댓글 내용
+     * @return 생성된 Comment 엔티티
+     */
     public Comment toCreateComment(Member member, Post post, Comment parent, String content){
         return Comment.builder()
                 .post(post)
@@ -23,6 +32,13 @@ public class CommentConverter {
                 .build();
     }
 
+    /**
+     * 댓글 좋아요 클릭 시 사용할 CommentLike 엔티티 생성
+     *
+     * @param comment 대상 댓글
+     * @param member 좋아요 누른 사용자
+     * @return CommentLike 엔티티
+     */
     public CommentLike toCommentLike(Comment comment, Member member){
         return CommentLike.builder()
                 .comment(comment)
@@ -30,6 +46,15 @@ public class CommentConverter {
                 .build();
     }
 
+    /**
+     * Comment 엔티티를 댓글 상세 응답 DTO로 변환
+     * - 삭제된 댓글은 '삭제된 댓글입니다.'로 표시
+     * - isMyComment, isLiked 여부도 함께 반환
+     *
+     * @param comment 댓글 엔티티
+     * @param member 현재 로그인한 사용자
+     * @return 댓글 상세 DTO
+     */
     public CommentResponseDto.CommentDetailDto toCommentDetailDto(Comment comment, Member member) {
         boolean isMyComment = comment.getMember().getId().equals(member.getId());
         boolean isLiked = comment.getCommentLikes().stream()

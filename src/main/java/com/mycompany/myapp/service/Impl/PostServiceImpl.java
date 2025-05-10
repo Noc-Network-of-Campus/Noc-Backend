@@ -6,8 +6,6 @@ import com.mycompany.myapp.domain.enums.Category;
 import com.mycompany.myapp.domain.enums.LikeResult;
 import com.mycompany.myapp.domain.enums.SortType;
 import com.mycompany.myapp.exception.CustomExceptions;
-import com.mycompany.myapp.exception.ResponseMessage;
-import com.mycompany.myapp.exception.StatusCode;
 import com.mycompany.myapp.repository.ImageRepository;
 import com.mycompany.myapp.repository.PostLikeRepository;
 import com.mycompany.myapp.repository.PostRepository;
@@ -16,9 +14,6 @@ import com.mycompany.myapp.service.PostService;
 import com.mycompany.myapp.util.S3Uploader;
 import com.mycompany.myapp.web.dto.PostRequestDto;
 import com.mycompany.myapp.web.dto.PostResponseDto;
-import com.mycompany.myapp.web.dto.base.DefaultRes;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -27,15 +22,9 @@ import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -55,7 +44,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostResponseDto.SimplePostDto> getPostsByCategoryWithCursor(Category category, SortType sort, Long lastPostId, Integer size){
-        if (size < 1) throw new IllegalArgumentException("size는 1 이상이어야 합니다.");
+        if (size < 1 || size > 100) {
+            throw new IllegalArgumentException("페이지 크기는 1 이상 100 이하로 지정해야 합니다.");
+        }
 
         List<Post> posts;
 
@@ -66,7 +57,9 @@ public class PostServiceImpl implements PostService {
 
             if (lastPostId != null) {
                 Post lastPost = postRepository.findById(lastPostId).orElse(null);
-                if (lastPost == null) return Collections.emptyList();
+
+                // 게시글 존재 여부 확인
+                if (lastPost == null) throw new IllegalArgumentException("유효하지 않은 마지막 게시글 ID입니다.");
                 lastLikeCount = lastPost.getLikeCount();
             }
 
@@ -88,7 +81,10 @@ public class PostServiceImpl implements PostService {
     @Override
     public List<PostResponseDto.SimplePostDto> getPostsByCategoryWithOffest(Category category, SortType sort, Integer page, Integer size){
         if (page < 1) throw new IllegalArgumentException("페이지는 1부터 시작합니다.");
-        if (size < 1) throw new IllegalArgumentException("size는 1 이상이어야 합니다.");
+
+        if (size < 1 || size > 100) {
+            throw new IllegalArgumentException("페이지 크기는 1 이상 100 이하로 지정해야 합니다.");
+        }
 
         Pageable pageable;
 
@@ -197,10 +193,6 @@ public class PostServiceImpl implements PostService {
                 ? Category.valueOf(request.getCategory())
                 : Category.FREE;
 
-        if (request.getLatitude() == null || request.getLongitude() == null) {
-            throw new IllegalArgumentException("위도/경도 값이 누락되었습니다.");
-        }
-
         // Point 생성
         Point location = new GeometryFactory(new PrecisionModel(), 4326)
                 .createPoint(new Coordinate(request.getLongitude(), request.getLatitude()));
@@ -233,7 +225,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostResponseDto.SimplePostDto> searchByTitleWithCursor(String keyword, Long lastPostId, Integer size) {
-        if (size < 1) throw new IllegalArgumentException("size는 1 이상이어야 합니다.");
+        if (keyword == null || keyword.trim().isEmpty()) {
+            throw new IllegalArgumentException("검색어는 필수입니다.");
+        }
+
+        if (size < 1 || size > 100) {
+            throw new IllegalArgumentException("페이지 크기는 1 이상 100 이하로 지정해야 합니다.");
+        }
 
         // 최신순 정렬을 위해 id DESC 조건
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
@@ -255,13 +253,16 @@ public class PostServiceImpl implements PostService {
 
         return postIds.stream()
                 .map(postMap::get)
+                .filter(Objects::nonNull)
                 .map(postConverter::toSimplePostDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<PostResponseDto.SimplePostDto> getMyPosts(Long lastPostId, Integer size, Member member){
-        if (size < 1) throw new IllegalArgumentException("size는 1 이상이어야 합니다.");
+        if (size < 1 || size > 100) {
+            throw new IllegalArgumentException("페이지 크기는 1 이상 100 이하로 지정해야 합니다.");
+        }
 
         Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
 
