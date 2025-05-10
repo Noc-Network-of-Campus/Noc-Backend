@@ -232,25 +232,44 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostResponseDto.SimplePostDto> searchByTitle(String keyword, Integer page, Integer size) {
-        if (page < 1) throw new IllegalArgumentException("페이지는 1부터 시작합니다.");
+    public List<PostResponseDto.SimplePostDto> searchByTitleWithCursor(String keyword, Long lastPostId, Integer size) {
         if (size < 1) throw new IllegalArgumentException("size는 1 이상이어야 합니다.");
 
-        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(Sort.Direction.DESC, "id")); // 최신순
+        // 최신순 정렬을 위해 id DESC 조건
+        Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
 
-        // 페이징 + 정렬 검색
-        Page<PostDocument> pageDocs = postSearchRepository.findByTitleContaining(keyword, pageable);
+        Page<PostDocument> pageDocs;
+
+        if (lastPostId == null) {
+            pageDocs = postSearchRepository.findByTitleContaining(keyword, pageable);
+        } else {
+            pageDocs = postSearchRepository.findByTitleContainingAndIdLessThan(keyword, lastPostId, pageable);
+        }
 
         List<Long> postIds = pageDocs.getContent().stream()
                 .map(PostDocument::getId)
                 .collect(Collectors.toList());
 
         List<Post> posts = postRepository.findAllById(postIds);
-
-        // 최신순 정렬
         Map<Long, Post> postMap = posts.stream().collect(Collectors.toMap(Post::getId, p -> p));
+
         return postIds.stream()
                 .map(postMap::get)
+                .map(postConverter::toSimplePostDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PostResponseDto.SimplePostDto> getMyPosts(Long lastPostId, Integer size, Member member){
+        if (size < 1) throw new IllegalArgumentException("size는 1 이상이어야 합니다.");
+
+        Pageable pageable = PageRequest.of(0, size, Sort.by(Sort.Direction.DESC, "id"));
+
+        List<Post> posts = (lastPostId == null)
+                ? postRepository.findByMemberOrderByIdDesc(member, pageable)
+                : postRepository.findByMemberAndIdLessThanOrderByIdDesc(member, lastPostId, pageable);
+
+        return posts.stream()
                 .map(postConverter::toSimplePostDto)
                 .collect(Collectors.toList());
     }
