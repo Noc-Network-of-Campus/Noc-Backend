@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Random;
 
 @Service
 @Transactional(readOnly = true)
@@ -36,5 +38,26 @@ public class MemberServiceImpl implements MemberService {
 
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new NoSuchElementException("Member not found"));
+    }
+
+    @Override
+    public String createNickname() {
+        String nickname = generateRandomNickname();
+        while (memberRepository.existsByNickname(nickname)) {
+            nickname = generateRandomNickname();
+        }
+        return nickname;
+    }
+
+    private static final List<String> ADJECTIVES = List.of(
+        "푸른", "빛나는", "조용한", "활기찬", "깊은", "자유로운", "신비한", "따뜻한", "열정적인", "차분한"
+    );
+
+    private static final List<String> NOUNS = List.of("쿠옹", "쿠밍");
+
+    private static String generateRandomNickname() {
+        String adjective = ADJECTIVES.get(new Random().nextInt(ADJECTIVES.size()));
+        String noun = NOUNS.get(new Random().nextInt(NOUNS.size()));
+        return adjective + " " + noun;
     }
 }

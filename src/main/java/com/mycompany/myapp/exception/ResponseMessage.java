@@ -27,4 +27,7 @@ public class ResponseMessage {
     //map
     public static final String READ_MAP_SUCCESS = "카테고리별 지도 조회 성공";
     public static final String READ_PINS_SUCCESS = "핀 리스트 조회 성공";
+
+    //member
+    public static final String CREATE_NICKNAME_SUCCESS = "닉네임 생성 성공";
 }
