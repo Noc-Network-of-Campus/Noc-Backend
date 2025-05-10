@@ -1,9 +1,7 @@
 package com.mycompany.myapp.service.Impl;
 
 import com.mycompany.myapp.converter.ReportConverter;
-import com.mycompany.myapp.domain.Comment;
 import com.mycompany.myapp.domain.Member;
-import com.mycompany.myapp.domain.Post;
 import com.mycompany.myapp.domain.Report;
 import com.mycompany.myapp.domain.enums.ReportTargetType;
 import com.mycompany.myapp.repository.CommentRepository;

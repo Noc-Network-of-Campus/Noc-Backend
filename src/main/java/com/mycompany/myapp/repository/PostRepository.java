@@ -1,5 +1,6 @@
 package com.mycompany.myapp.repository;
 
+import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.domain.Post;
 import com.mycompany.myapp.domain.enums.Category;
 import org.springframework.data.domain.Page;
@@ -57,4 +58,8 @@ public interface PostRepository  extends JpaRepository<Post, Long> {
             @Param("category") String category,
             @Param("point") String pointWKT,
             @Param("radius") double radius);
+
+
+    List<Post> findByMemberOrderByIdDesc(Member member, Pageable pageable);
+    List<Post> findByMemberAndIdLessThanOrderByIdDesc(Member member, Long lastPostId, Pageable pageable);
 }

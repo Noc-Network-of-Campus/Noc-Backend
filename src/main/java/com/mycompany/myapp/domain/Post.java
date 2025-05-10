@@ -8,6 +8,12 @@ import org.locationtech.jts.geom.Point;
 import javax.persistence.*;
 import java.util.List;
 
+/**
+ * 사용자가 작성한 게시글(Post)을 나타내는 엔티티
+ * - 제목, 본문, 카테고리, 위치정보 포함
+ * - 댓글, 이미지, 좋아요 등의 연관 엔티티와 연계됨
+ * - 댓글 수 및 좋아요 수는 직접 관리
+ */
 @Entity
 @Getter @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,6 +36,7 @@ public class Post extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Category category;
 
+    /** 게시글 작성 위치 (위도/경도 정보) */
     @Column(columnDefinition = "POINT")
     private Point location;
 
