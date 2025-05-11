@@ -28,9 +28,6 @@ public class MapServiceImpl implements MapService {
     public List<MapResponseDto.MapPinDto> getPinsByCategoryAndLocation(Category category, Double latitude, Double longitude){
         double radius = 10000.0; //미터 단위
 
-        if (latitude == null || longitude == null)
-            throw new IllegalArgumentException("위도 또는 경도가 없습니다.");
-
         String point = String.format("POINT(%f %f)", latitude, longitude);
         String categoryStr = category != null ? category.name() : null;
 

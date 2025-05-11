@@ -7,6 +7,10 @@ import lombok.*;
 
 import javax.persistence.*;
 
+/**
+ * 서비스 회원 정보를 나타내는 엔티티
+ * - 이메일을 기준으로 식별, 소셜 로그인 기반의 사용자
+ */
 @Entity
 @Builder @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
