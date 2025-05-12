@@ -1,6 +1,7 @@
 package com.mycompany.myapp.service;
 
 import com.mycompany.myapp.domain.Member;
+import com.mycompany.myapp.web.dto.MemberRequestDto;
 
 public interface MemberService {
 
@@ -12,4 +13,5 @@ public interface MemberService {
      */
     Member getCurrentMember();
     String createNickname();
+    void createProfile(Member member, MemberRequestDto.CreateProfileDto createProfileDto);
 }

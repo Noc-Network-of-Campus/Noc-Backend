@@ -39,11 +39,10 @@ public class JwtProvider implements InitializingBean {
 		secretKey = Keys.hmacShaKeyFor(keyBytes);
 	}
 
-	public String generateToken(Long memberId, String email, Boolean isRegistered) {
+	public String generateToken(Long memberId, String email) {
 		return Jwts.builder()
 			.claim("memberId", memberId)
 			.claim("email", email)
-			.claim("isRegistered", isRegistered)
 			.setIssuedAt(new Date(System.currentTimeMillis()))
 			.setExpiration(new Date(System.currentTimeMillis() + expireAccessMs))
 			.signWith(secretKey)
@@ -77,14 +76,11 @@ public class JwtProvider implements InitializingBean {
 			.getBody();
 		Long memberId = claims.get("memberId", Long.class);
 		String email = claims.get("email", String.class);
-		Boolean isRegistered = claims.get("isRegistered", Boolean.class);
-		System.out.println("memberId = " + memberId);
 
 		// Authentication 객체를 생성하여 반환
 		UserDetails userDetails = CustomUserDetails.builder()
 			.id(memberId)
 			.email(email)
-			.isRegistered(isRegistered)
 			.build();
 
 		List<SimpleGrantedAuthority> authorities = Collections.singletonList(

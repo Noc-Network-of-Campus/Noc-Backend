@@ -4,6 +4,8 @@ import com.mycompany.myapp.config.security.CustomUserDetails;
 import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.repository.MemberRepository;
 import com.mycompany.myapp.service.MemberService;
+import com.mycompany.myapp.web.dto.MemberRequestDto;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -28,16 +30,14 @@ public class MemberServiceImpl implements MemberService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED, "로그인 되지 않았습니다."
-            );
+            throw new IllegalArgumentException("로그인 되지 않았습니다.");
         }
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         Long memberId = userDetails.getId();
 
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new NoSuchElementException("Member not found"));
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 
     @Override
@@ -47,6 +47,17 @@ public class MemberServiceImpl implements MemberService {
             nickname = generateRandomNickname();
         }
         return nickname;
+    }
+
+    @Override
+    @Transactional
+    public void createProfile(Member member, MemberRequestDto.CreateProfileDto request) {
+        if(memberRepository.existsByNickname(request.getNickname())){
+            throw new IllegalArgumentException("이미 사용중인 닉네임입니다.");
+        }
+        member.setNickname(request.getNickname());
+        member.setGender(request.getGender());
+        member.completeRegistration();
     }
 
     private static final List<String> ADJECTIVES = List.of(

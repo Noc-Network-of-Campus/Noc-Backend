@@ -23,16 +23,19 @@ public class Member extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String email;
 
-    private String nickname;
+    @Setter
+	private String nickname;
 
     private String profileUrl;
 
     private boolean isRegistered;
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void completeRegistration() {
+        this.isRegistered = true;
     }
+
 }

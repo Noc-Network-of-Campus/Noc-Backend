@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 public class CustomUserDetails implements UserDetails {
 	private Long id;
 	private String email;
-	private boolean isRegistered;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
