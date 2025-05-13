@@ -56,6 +56,8 @@ public class CommentConverter {
      * @return 댓글 상세 DTO
      */
     public CommentResponseDto.CommentDetailDto toCommentDetailDto(Comment comment, Member member) {
+        Member author = comment.getMember();
+
         boolean isMyComment = comment.getMember().getId().equals(member.getId());
         boolean isLiked = comment.getCommentLikes().stream()
                 .anyMatch(like -> like.getMember().getId().equals(member.getId()));
@@ -63,7 +65,7 @@ public class CommentConverter {
 
         return CommentResponseDto.CommentDetailDto.builder()
                 .commentId(comment.getId())
-                .nickname(member.getNickname())
+                .nickname(isDeleted ? "(삭제)" : member.getNickname())
                 .content(isDeleted ? "삭제된 댓글입니다." : comment.getContent())
                 .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
                 .isMyComment(isMyComment)

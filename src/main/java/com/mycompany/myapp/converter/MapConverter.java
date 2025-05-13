@@ -17,7 +17,7 @@ public class MapConverter {
      */
     public MapResponseDto.MapPinDto toPin(Post post){
         return MapResponseDto.MapPinDto.builder()
-                .pinId(post.getId())
+                .postId(post.getId())
                 .category(post.getCategory().name())
                 .latitude(post.getLocation().getY())
                 .longitude(post.getLocation().getX())
