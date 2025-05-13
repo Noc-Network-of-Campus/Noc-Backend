@@ -28,7 +28,7 @@ public class PostResponseDto {
         private int commentCount;
 
         /** 썸네일 이미지 URL (sortOrder == 0) */
-        private String thumbnailImageUrl;
+        private String imageUrl;
 
         private LocalDateTime createdAt;
     }

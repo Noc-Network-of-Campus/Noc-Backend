@@ -88,7 +88,7 @@ public class PostConverter {
                 .content(getPreviewContent(post.getContent()))
                 .likeCount(post.getLikeCount())
                 .commentCount(post.getCommentCount())
-                .thumbnailImageUrl(getThumbnailImageUrl(post))
+                .imageUrl(getThumbnailImageUrl(post))
                 .createdAt(post.getCreatedAt())
                 .build();
     }

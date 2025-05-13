@@ -16,7 +16,7 @@ public class MapResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MapPinDto {
-        private Long pinId;
+        private Long postId;
         private String category;
         private Double latitude;
         private Double longitude;
