@@ -55,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
 		}
 
 		// Access Token 재발급
-		String newAccessToken = jwtProvider.generateToken(member.getId(), member.getEmail(), member.isRegistered());
+		String newAccessToken = jwtProvider.generateToken(member.getId(), member.getEmail());
 		// Refresh Token 재발급
 		String newRefreshToken = jwtProvider.generateToken(member.getId());
 

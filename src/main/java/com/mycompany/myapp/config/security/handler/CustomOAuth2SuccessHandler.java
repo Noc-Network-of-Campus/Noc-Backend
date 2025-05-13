@@ -32,7 +32,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 		Boolean isRegistered = (Boolean) user.getAttributes().get("isRegistered");
 
 		//Access Token 생성
-		String jwt = jwtProvider.generateToken(memberId, email, isRegistered);
+		String jwt = jwtProvider.generateToken(memberId, email);
 
 		//Refresh Token 생성
 		String refreshToken = jwtProvider.generateToken(memberId);
