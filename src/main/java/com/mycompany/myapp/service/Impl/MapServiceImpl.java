@@ -38,6 +38,21 @@ public class MapServiceImpl implements MapService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<MapResponseDto.MapPinDto> getPinsByCategory(Category category){
+        List<Post> posts;
+
+        if (category != null) {
+            posts = postRepository.findByCategory(category);
+        } else {
+            posts = postRepository.findAll();
+        }
+
+        return posts.stream()
+                .map(mapConverter::toPin)
+                .collect(Collectors.toList());
+    }
+
     public List<PostResponseDto.SimplePostDto> getPinsByIds(List<Long> ids){
         List<Post> posts = postRepository.findAllById(ids);
 

@@ -48,10 +48,10 @@ public class MapController extends BaseController {
      * @param longitude 사용자의 현재 경도
      * @return 지도에 표시할 MapPinDto 리스트
      */
-    @ApiOperation(value = "카테고리별 지도 조회 API")
+    @ApiOperation(value = "카테고리별 지도 조회 API(사용자 위치 기반)")
     @ApiResponse(code = 200, message = "카테고리별 지도 조회 성공")
-    @GetMapping
-    public ResponseEntity getMapByCategory(@ApiParam(value = "카테고리. 없으면 전체", example = "FOOD")
+    @GetMapping("/location")
+    public ResponseEntity getMapByCategoryAndLocation(@ApiParam(value = "카테고리. 없으면 전체", example = "FOOD")
                                                @RequestParam(required = false) Category category,
 
                                            @ApiParam(value = "사용자 위도", example = "37.123456")
@@ -60,11 +60,35 @@ public class MapController extends BaseController {
                                            @ApiParam(value = "사용자 경도", example = "127.123456")
                                                @RequestParam(required = false) Double longitude){
         try {
-            logger.info("Received request: method={}, path={}, description={}", "GET", "/api/map", "카테고리별 지도 조회 API");
+            logger.info("Received request: method={}, path={}, description={}", "GET", "/api/map/location", "카테고리별 지도 조회 API");
 
             Member member = memberService.getCurrentMember();
 
             List<MapResponseDto.MapPinDto> res = mapService.getPinsByCategoryAndLocation(category, latitude, longitude);
+
+            return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_MAP_SUCCESS, res), HttpStatus.OK);
+        } catch (CustomExceptions.testException e) {
+            return handleApiException(e, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    /**
+     * 카테고리를 기반으로 지도에 표시할 핀 정보 조회
+     *
+     * @param category 카테고리 (null이면 전체)
+     * @return 지도에 표시할 MapPinDto 리스트
+     */
+    @ApiOperation(value = "카테고리별 지도 조회 API")
+    @ApiResponse(code = 200, message = "카테고리별 지도 조회 성공")
+    @GetMapping
+    public ResponseEntity getMapByCategory(@ApiParam(value = "카테고리. 없으면 전체", example = "FOOD")
+                                           @RequestParam(required = false) Category category){
+        try {
+            logger.info("Received request: method={}, path={}, description={}", "GET", "/api/map", "카테고리별 지도 조회 API");
+
+            Member member = memberService.getCurrentMember();
+
+            List<MapResponseDto.MapPinDto> res = mapService.getPinsByCategory(category);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_MAP_SUCCESS, res), HttpStatus.OK);
         } catch (CustomExceptions.testException e) {
