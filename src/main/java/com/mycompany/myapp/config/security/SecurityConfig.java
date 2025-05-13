@@ -43,6 +43,7 @@ public class SecurityConfig {
 				@Override
 				public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 					CorsConfiguration config = new CorsConfiguration();
+					config.addAllowedOrigin("http://localhost:3000");
 					config.addAllowedOrigin("http://localhost:8080");
 					config.addAllowedMethod("*");
 					config.addAllowedHeader("*");
