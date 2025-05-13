@@ -23,6 +23,14 @@ public interface MapService {
     List<MapResponseDto.MapPinDto> getPinsByCategoryAndLocation(Category category, Double latitude, Double longitude);
 
     /**
+     * 특정 카테고리를 기반으로 주변에 표시할 지도 핀 정보 조회
+     *
+     * @param category 카테고리 (null이면 전체)
+     * @return MapPinDto 리스트 (지도에 표시할 핀 정보)
+     */
+    List<MapResponseDto.MapPinDto> getPinsByCategory(Category category);
+
+    /**
      * 선택된 핀 ID 목록을 기반으로 게시글 목록을 조회
      * (예: 클러스터 클릭 시 상세 목록 요청)
      *

@@ -59,7 +59,7 @@ public class PostController extends BaseController {
      * @param size 한 페이지당 조회할 게시글 수
      * @return 게시글 목록 + nextCursor, hasNext 포함
      */
-    @ApiOperation(value = "카테고리별 게시글 조회 API", notes = "커서 기반 페이징으로 구현")
+    @ApiOperation(value = "카테고리별 게시글 조회 API(cursor 기반)", notes = "커서 기반 페이징으로 구현")
     @ApiResponse(code = 200, message = "카테고리별 게시글 불러오기 성공")
     @GetMapping("/list/cursor")
     public ResponseEntity getPostsByCategoryWithCursor(
@@ -95,7 +95,7 @@ public class PostController extends BaseController {
      * @param size 페이지 크기
      * @return 게시글 리스트
      */
-    @ApiOperation(value = "카테고리별 게시글 조회 API", notes = "Offset 기반 페이징으로 구현")
+    @ApiOperation(value = "카테고리별 게시글 조회 API(offset 기반)", notes = "Offset 기반 페이징으로 구현")
     @ApiResponse(code = 200, message = "카테고리별 게시글 불러오기 성공")
     @GetMapping("/list/page")
     public ResponseEntity getPostsByCategoryWithOffset(@ApiParam(value = "카테고리. 없으면 전체 게시글", example = "FOOD")
