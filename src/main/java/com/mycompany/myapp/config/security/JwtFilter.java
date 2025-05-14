@@ -65,6 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
 			uri.startsWith("/webjars") ||
 			uri.startsWith("/login") ||
 			uri.startsWith("/oauth2") ||
+			uri.startsWith("/api/map") ||
 			uri.startsWith("/api/auth/reissue");
 	}
 

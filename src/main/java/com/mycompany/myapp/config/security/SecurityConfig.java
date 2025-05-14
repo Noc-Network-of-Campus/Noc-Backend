@@ -43,6 +43,7 @@ public class SecurityConfig {
 				@Override
 				public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
 					CorsConfiguration config = new CorsConfiguration();
+					config.addAllowedOrigin("http://localhost:3000");
 					config.addAllowedOrigin("http://localhost:8080");
 					config.addAllowedMethod("*");
 					config.addAllowedHeader("*");
@@ -67,7 +68,8 @@ public class SecurityConfig {
 					"/v3/api-docs",
 					"/swagger-resources/**",
 					"/webjars/**",
-					"/api/auth/reissue"
+					"/api/auth/reissue",
+					"/api/map/**"
 				).permitAll()
 				.anyRequest().authenticated())
 			.oauth2Login(oauth2 -> oauth2

@@ -62,7 +62,7 @@ public class MapController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "GET", "/api/map/location", "카테고리별 지도 조회 API");
 
-            Member member = memberService.getCurrentMember();
+            // Member member = memberService.getCurrentMember();
 
             List<MapResponseDto.MapPinDto> res = mapService.getPinsByCategoryAndLocation(category, latitude, longitude);
 

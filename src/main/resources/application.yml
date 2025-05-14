@@ -42,9 +42,12 @@ spring:
   data:
     elasticsearch:
       rest:
-        uris: http://localhost:9200
+        uris: ${ELASTICSEARCH_URL}
+        username: ${ELASTICSEARCH_USERNAME}
+        password: ${ELASTICSEARCH_PASSWORD}
+
   redis:
-      host: localhost
+      host: ${REDIS_HOST}
       port: 6379
 logging.level:
   org.hibernate.SQL: debug
