@@ -68,7 +68,8 @@ public class SecurityConfig {
 					"/v3/api-docs",
 					"/swagger-resources/**",
 					"/webjars/**",
-					"/api/auth/reissue"
+					"/api/auth/reissue",
+					"/api/map/**"
 				).permitAll()
 				.anyRequest().authenticated())
 			.oauth2Login(oauth2 -> oauth2
