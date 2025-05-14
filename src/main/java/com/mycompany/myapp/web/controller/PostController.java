@@ -70,8 +70,6 @@ public class PostController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/list/cursor", "카테고리별 게시글 조회 API");
 
-            Member member = memberService.getCurrentMember();
-
             List<PostResponseDto.SimplePostDto> postList = postService.getPostsByCategoryWithCursor(category, sort, lastPostId, size);
             Long nextCursor = (postList.isEmpty()) ? null : postList.get(postList.size() - 1).getPostId();
 
@@ -108,8 +106,6 @@ public class PostController extends BaseController {
                                                     @RequestParam Integer size){
         try {
             logger.info("Received request: method={}, path={}, description={}", "GET", "/api/post/list/page", "카테고리별 게시글 조회 API");
-
-            Member member = memberService.getCurrentMember();
 
             List<PostResponseDto.SimplePostDto> res = postService.getPostsByCategoryWithOffest(category, sort, page, size);
 
