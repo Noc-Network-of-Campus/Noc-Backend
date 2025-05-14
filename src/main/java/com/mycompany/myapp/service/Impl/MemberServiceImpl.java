@@ -1,10 +1,12 @@
 package com.mycompany.myapp.service.Impl;
 
 import com.mycompany.myapp.config.security.CustomUserDetails;
+import com.mycompany.myapp.converter.MemberConverter;
 import com.mycompany.myapp.domain.Member;
 import com.mycompany.myapp.repository.MemberRepository;
 import com.mycompany.myapp.service.MemberService;
 import com.mycompany.myapp.web.dto.MemberRequestDto;
+import com.mycompany.myapp.web.dto.MemberResponseDto;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,6 +26,7 @@ import java.util.Random;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final MemberConverter memberConverter;
 
     @Override
     public Member getCurrentMember(){
@@ -58,6 +61,13 @@ public class MemberServiceImpl implements MemberService {
         member.setNickname(request.getNickname());
         member.setGender(request.getGender());
         member.completeRegistration();
+    }
+
+    @Override
+    public MemberResponseDto.ProfileDto getProfile(Member member) {
+        Member findMember = memberRepository.findById(member.getId())
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다."));
+        return memberConverter.toProfileDto(findMember);
     }
 
     private static final List<String> ADJECTIVES = List.of(

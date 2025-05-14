@@ -2,6 +2,7 @@ package com.mycompany.myapp.web.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import com.mycompany.myapp.exception.StatusCode;
 import com.mycompany.myapp.service.MemberService;
 import com.mycompany.myapp.web.controller.base.BaseController;
 import com.mycompany.myapp.web.dto.MemberRequestDto;
+import com.mycompany.myapp.web.dto.MemberResponseDto;
 import com.mycompany.myapp.web.dto.base.DefaultRes;
 
 import io.swagger.annotations.Api;
@@ -53,6 +55,22 @@ public class MemberController extends BaseController {
 			Member currentMember = memberService.getCurrentMember();
 			memberService.createProfile(currentMember, request);
 			return new ResponseEntity(DefaultRes.res(StatusCode.OK, ResponseMessage.SET_PROFILE_SUCCESS), HttpStatus.OK);
+		} catch (Exception e) {
+			return handleApiException(e, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	//사용자 프로필 조회
+	@ApiOperation(value = "사용자 프로필 조회 API")
+	@ApiResponse(code = 200, message = "사용자 프로필 조회 성공")
+	@GetMapping("/profile/view")
+	public ResponseEntity getProfile() {
+		try {
+			logger.info("Received request: method={}, path={}, description={}", "POST", "/api/members/profile/view",
+				"사용자 프로필 조회 API");
+			Member currentMember = memberService.getCurrentMember();
+			MemberResponseDto.ProfileDto res = memberService.getProfile(currentMember);
+			return new ResponseEntity(DefaultRes.res(StatusCode.OK, ResponseMessage.GET_PROFILE_SUCCESS, res), HttpStatus.OK);
 		} catch (Exception e) {
 			return handleApiException(e, HttpStatus.BAD_REQUEST);
 		}

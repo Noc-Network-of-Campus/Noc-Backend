@@ -32,4 +32,5 @@ public class ResponseMessage {
     //member
     public static final String CREATE_NICKNAME_SUCCESS = "닉네임 생성 성공";
     public static final String SET_PROFILE_SUCCESS = "프로필 설정 성공";
+    public static final String GET_PROFILE_SUCCESS = "프로필 조회 성공";
 }
