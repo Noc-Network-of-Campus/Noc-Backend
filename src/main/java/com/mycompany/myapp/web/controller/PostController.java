@@ -259,8 +259,6 @@ public class PostController extends BaseController {
             //elasticsearch 마이그레이션
             // postIndexer.migrateToElasticsearch();
 
-            Member member = memberService.getCurrentMember();
-
             List<PostResponseDto.SimplePostDto> result = postService.searchByTitleWithCursor(keyword, lastPostId, size);
             Long nextCursor = result.isEmpty() ? null : result.get(result.size() - 1).getPostId();
 
