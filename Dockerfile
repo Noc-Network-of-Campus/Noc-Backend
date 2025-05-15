@@ -4,8 +4,9 @@ WORKDIR /build
 
 COPY build.gradle settings.gradle ./
 COPY gradle gradle
-COPY src src
+RUN gradle dependencies || true
 
+COPY src src
 RUN gradle clean build -x test
 
 FROM openjdk:17-jdk AS runner
