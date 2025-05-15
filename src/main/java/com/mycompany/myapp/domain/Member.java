@@ -38,4 +38,10 @@ public class Member extends BaseEntity {
         this.isRegistered = true;
     }
 
+    public void withdraw() {
+        this.nickname = null;
+        this.gender = null;
+        this.isRegistered = false;
+    }
+
 }
