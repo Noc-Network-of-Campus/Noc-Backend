@@ -16,5 +16,5 @@ public interface MemberService {
     String createNickname();
     void createProfile(Member member, MemberRequestDto.CreateProfileDto createProfileDto);
     MemberResponseDto.ProfileDto getProfile(Member member);
-
+    void withdraw(Member member);
 }
