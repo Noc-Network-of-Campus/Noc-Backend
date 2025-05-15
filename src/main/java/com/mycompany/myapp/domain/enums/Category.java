@@ -7,7 +7,8 @@ public enum Category {
     LOST("분실물"),
     MATCHING("인연찾기"),
     FREE("사담"),
-    NOTICE("공지");
+    NOTICE("공지"),
+    PUB("주점");
     private final String categoryName;
 
     Category(String categoryName) {

@@ -29,6 +29,8 @@ public class S3Uploader {
             metadata.setContentLength(file.getSize());
             metadata.setContentType(file.getContentType());
 
+            metadata.setContentDisposition("inline");
+
             PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, fileName, file.getInputStream(), metadata);
 
             amazonS3.putObject(putObjectRequest);
