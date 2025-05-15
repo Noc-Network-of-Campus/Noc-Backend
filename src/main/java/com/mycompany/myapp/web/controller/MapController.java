@@ -86,8 +86,6 @@ public class MapController extends BaseController {
         try {
             logger.info("Received request: method={}, path={}, description={}", "GET", "/api/map", "카테고리별 지도 조회 API");
 
-            // Member member = memberService.getCurrentMember();
-
             List<MapResponseDto.MapPinDto> res = mapService.getPinsByCategory(category);
 
             return new ResponseEntity( DefaultRes.res(StatusCode.OK, ResponseMessage.READ_MAP_SUCCESS, res), HttpStatus.OK);
@@ -109,8 +107,6 @@ public class MapController extends BaseController {
     public ResponseEntity getPins(@RequestParam List<Long> ids){
         try {
             logger.info("Received request: method={}, path={}, description={}", "GET", "/api/map/pins", "핀 리스트 조회 API");
-
-            // Member member = memberService.getCurrentMember();
 
             List<PostResponseDto.SimplePostDto> res = mapService.getPinsByIds(ids);
 
